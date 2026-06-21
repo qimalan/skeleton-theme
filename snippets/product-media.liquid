@@ -1,0 +1,20 @@
+{% doc %}
+Renders a product media item with image, video, external video, and model support.
+@param {media} media - Product media object.
+@param {string} [loading] - Image loading strategy.
+{% enddoc %}
+
+{%- if media != blank -%}
+  <div class="product-media product-media--{{ media.media_type }}" data-media-id="{{ media.id }}">
+    {%- case media.media_type -%}
+      {%- when 'image' -%}
+        {% render 'image', image: media, width: 1600, height: 1600, crop: 'center', loading: loading %}
+      {%- when 'external_video' -%}
+        {{ media | external_video_url | external_video_tag: class: 'product-media__element', loading: 'lazy' }}
+      {%- when 'video' -%}
+        {{ media | media_tag: image_size: '1600x', controls: true, preload: 'metadata', class: 'product-media__element' }}
+      {%- when 'model' -%}
+        {{ media | media_tag: image_size: '1600x', toggleable: true, class: 'product-media__element' }}
+    {%- endcase -%}
+  </div>
+{%- endif -%}

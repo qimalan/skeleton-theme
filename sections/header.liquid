@@ -18,6 +18,23 @@
       {%- endif -%}
     </nav>
 
+    {%- if section.settings.menu != blank -%}
+      <details class="site-header__mobile-menu">
+        <summary class="site-header__mobile-summary" aria-label="{{ 'general.menu' | t }}">
+          {% render 'icon', icon: 'menu' %}
+          <span class="visually-hidden">{{ 'general.menu' | t }}</span>
+        </summary>
+
+        <div class="site-header__mobile-panel">
+          <ul class="site-header__mobile-list page-width" role="list">
+            {%- for link in section.settings.menu.links -%}
+              <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      </details>
+    {%- endif -%}
+
     <div class="site-header__actions">
       {%- if settings.show_search -%}
         <a href="{{ routes.search_url }}" aria-label="{{ 'search.title' | t }}">
@@ -89,11 +106,44 @@
   }
 
   .site-header__menu a,
+  .site-header__mobile-list a,
   .site-header__actions a {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
     text-decoration: none;
+  }
+
+  .site-header__mobile-menu {
+    display: none;
+  }
+
+  .site-header__mobile-summary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--button-radius);
+  }
+
+  .site-header__mobile-panel {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 100%;
+    z-index: 11;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-background);
+  }
+
+  .site-header__mobile-list {
+    display: grid;
+    gap: 0.75rem;
+    padding-block: 1rem;
+    margin-block: 0;
+    list-style: none;
   }
 
   .site-header__actions {
@@ -116,11 +166,20 @@
 
   @media (max-width: 749px) {
     .site-header__inner {
-      grid-template-columns: 1fr auto;
+      grid-template-columns: auto 1fr auto;
     }
 
     .site-header__nav {
       display: none;
+    }
+
+    .site-header__mobile-menu {
+      display: block;
+      justify-self: end;
+    }
+
+    .site-header__actions {
+      justify-content: end;
     }
   }
 {% endstylesheet %}

@@ -1,13 +1,14 @@
 {%- liquid
   assign featured_product = section.settings.product
+  assign current_variant = featured_product.selected_or_first_available_variant
 -%}
 
-<section class="page-width featured-product-section">
+<section class="page-width featured-product-section" data-product-root>
   {%- if featured_product != blank -%}
     <div class="featured-product-section__grid featured-product-section__grid--{{ section.settings.media_position }}">
       <div class="featured-product-section__media">
         {%- if featured_product.featured_media != blank -%}
-          {% render 'image', image: featured_product.featured_media, width: 1600, height: 1600, crop: 'center' %}
+          {% render 'product-media', media: featured_product.featured_media, loading: 'lazy' %}
         {%- endif -%}
       </div>
 
@@ -17,24 +18,53 @@
           <h2>{{ featured_product.title }}</h2>
         </div>
 
-        {% render 'price', product: featured_product, show_compare_at_price: true %}
+        <div data-variant-price>
+          {% render 'price', product: featured_product, variant: current_variant, show_compare_at_price: true %}
+        </div>
 
         {%- if featured_product.description != blank -%}
           <div class="rte">{{ featured_product.description }}</div>
         {%- endif -%}
 
         {%- form 'product', featured_product, class: 'product-form' -%}
-          <input type="hidden" name="id" value="{{ featured_product.selected_or_first_available_variant.id }}">
-          <button class="button" type="submit" name="add" {% unless featured_product.selected_or_first_available_variant.available %}disabled{% endunless %}>
-            {{ 'products.product.add_to_cart' | t }}
-          </button>
+          <input type="hidden" name="id" value="{{ current_variant.id }}">
+
+          {% render 'variant-picker', product: featured_product, id_prefix: section.id %}
+
+          <label class="field product-form__quantity">
+            <span>{{ 'products.product.quantity.label' | t }}</span>
+            <input class="field__input" type="number" name="quantity" value="1" min="1">
+          </label>
+
+          <div class="product-page__purchase">
+            <button
+              class="button"
+              type="submit"
+              name="add"
+              data-add-text="{{ 'products.product.add_to_cart' | t }}"
+              data-sold-out-text="{{ 'products.product.sold_out' | t }}"
+              {% unless current_variant.available %}disabled{% endunless %}
+            >
+              {%- if current_variant.available -%}
+                {{ 'products.product.add_to_cart' | t }}
+              {%- else -%}
+                {{ 'products.product.sold_out' | t }}
+              {%- endif -%}
+            </button>
+            <div
+              data-variant-status
+              data-available-text=""
+              data-unavailable-text="{{ 'products.product.sold_out' | t }}"
+              aria-live="polite"
+            ></div>
+          </div>
         {%- endform -%}
       </div>
     </div>
   {%- else -%}
     <div class="section-heading">
-      <p class="section-heading__eyebrow">Featured product</p>
-      <h2>Featured product</h2>
+      <p class="section-heading__eyebrow">{{ 'featured_product.eyebrow' | t }}</p>
+      <h2>{{ 'featured_product.title' | t }}</h2>
     </div>
   {%- endif -%}
 </section>
@@ -54,6 +84,27 @@
   .featured-product-section__content {
     display: grid;
     gap: 1rem;
+  }
+
+  .featured-product-section__media .product-media,
+  .featured-product-section__media .image,
+  .featured-product-section__media .image__element,
+  .featured-product-section__media .product-media__element {
+    width: 100%;
+  }
+
+  .featured-product-section__media .product-media__element {
+    aspect-ratio: 1;
+    height: auto;
+  }
+
+  .featured-product-section .product-form {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .featured-product-section .product-form__quantity {
+    max-width: 8rem;
   }
 
   @media (max-width: 749px) {

@@ -227,6 +227,7 @@ h6 + * {
 }
 
 .card__media {
+  position: relative;
   aspect-ratio: var(--card-ratio, 1);
   overflow: hidden;
   background: var(--color-surface);
@@ -238,6 +239,18 @@ h6 + * {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.card__image--secondary {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.card--product:hover .card__image--secondary,
+.card--product:focus-within .card__image--secondary {
+  opacity: 1;
 }
 
 .card__body {

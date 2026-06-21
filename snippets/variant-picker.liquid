@@ -1,0 +1,51 @@
+{% doc %}
+Renders a lightweight select-based variant picker with formatted variant data.
+@param {product} product - Product object.
+@param {string} id_prefix - Unique ID prefix for form controls.
+{% enddoc %}
+
+{%- if product.has_only_default_variant == false -%}
+  <variant-selects class="product-form__variants">
+    {%- for option in product.options_with_values -%}
+      <label class="field" for="{{ id_prefix }}-Option-{{ forloop.index0 }}">
+        <span>{{ option.name }}</span>
+        <select
+          id="{{ id_prefix }}-Option-{{ forloop.index0 }}"
+          class="field__input"
+          name="options[{{ option.name | escape }}]"
+        >
+          {%- for value in option.values -%}
+            <option value="{{ value | escape }}" {% if value == option.selected_value %}selected{% endif %}>
+              {{ value }}
+            </option>
+          {%- endfor -%}
+        </select>
+      </label>
+    {%- endfor -%}
+
+    <script type="application/json">
+      [
+        {%- for variant in product.variants -%}
+          {%- liquid
+            assign variant_price = variant.price | money
+            assign variant_compare_at_price = variant.compare_at_price | money
+            assign compare_at_price_value = variant.compare_at_price | default: 0
+
+            if settings.currency_code_enabled
+              assign variant_price = variant.price | money_with_currency
+              assign variant_compare_at_price = variant.compare_at_price | money_with_currency
+            endif
+          -%}
+          {
+            "id": {{ variant.id | json }},
+            "available": {{ variant.available | json }},
+            "options": {{ variant.options | json }},
+            "price": {{ variant_price | json }},
+            "compareAtPrice": {% if compare_at_price_value > variant.price %}{{ variant_compare_at_price | json }}{% else %}null{% endif %},
+            "sku": {{ variant.sku | json }}
+          }{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      ]
+    </script>
+  </variant-selects>
+{%- endif -%}

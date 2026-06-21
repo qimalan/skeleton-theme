@@ -7,9 +7,19 @@ Renders a product or variant price.
 {% enddoc %}
 
 {%- liquid
-  assign target = variant | default: product.selected_or_first_available_variant | default: product
+  assign target = product
+
+  if variant != blank
+    assign target = variant
+  endif
+
   assign compare_at_price = target.compare_at_price | default: 0
   assign price = target.price | default: 0
+
+  if product != blank and variant == blank and product.price_varies
+    assign price = product.price_min
+  endif
+
   assign money_price = price | money
   assign money_compare = compare_at_price | money
 
@@ -20,17 +30,24 @@ Renders a product or variant price.
 -%}
 
 {%- if target != blank -%}
-  <div class="price {{ class }}{% if compare_at_price > price %} price--sale{% endif %}{% unless target.available %} price--sold-out{% endunless %}">
-    <span class="price__current">
-      {%- if product != blank and product.price_varies and variant == blank and target == product -%}
+  <div
+    class="price {{ class }}{% if compare_at_price > price %} price--sale{% endif %}{% unless target.available %} price--sold-out{% endunless %}"
+    data-price
+  >
+    <span class="price__current" data-price-current>
+      {%- if product != blank and product.price_varies and variant == blank -%}
         {{ 'products.price.from_price_html' | t: price: money_price }}
       {%- else -%}
         {{ money_price }}
       {%- endif -%}
     </span>
 
-    {%- if show_compare_at_price and compare_at_price > price -%}
-      <s class="price__compare">{{ money_compare }}</s>
-    {%- endif -%}
+    <s
+      class="price__compare"
+      data-price-compare
+      {% unless show_compare_at_price and compare_at_price > price %}hidden{% endunless %}
+    >
+      {{ money_compare }}
+    </s>
   </div>
 {%- endif -%}

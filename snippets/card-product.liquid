@@ -32,7 +32,10 @@ Renders a product card for grids and featured sections.
     <a class="card__media-link" href="{{ product_item.url }}" aria-label="{{ product_item.title | escape }}">
       <div class="card__media" style="--card-ratio: {{ ratio }};">
         {%- if product_item.featured_media -%}
-          {% render 'image', image: product_item.featured_media, width: 1200, height: 1200, crop: 'center' %}
+          {% render 'image', image: product_item.featured_media, width: 1200, height: 1200, crop: 'center', class: 'card__image card__image--primary' %}
+          {%- if settings.show_secondary_image and product_item.media[1] != blank -%}
+            {% render 'image', image: product_item.media[1], width: 1200, height: 1200, crop: 'center', class: 'card__image card__image--secondary' %}
+          {%- endif -%}
         {%- else -%}
           {{ 'product-apparel-1' | placeholder_svg_tag: 'card__placeholder' }}
         {%- endif -%}

@@ -24,8 +24,8 @@
     {%- else -%}
       <p>{{ 'search.results_for_html' | t: terms: search.terms, count: search.results_count }}</p>
 
-      <div class="cards-grid product-grid">
-        {%- paginate search.results by 24 -%}
+      {%- paginate search.results by 24 -%}
+        <div class="cards-grid product-grid">
           {%- for result in search.results -%}
             {%- if result.object_type == 'product' -%}
               {% render 'card-product', card_product: result %}
@@ -40,10 +40,10 @@
               </article>
             {%- endif -%}
           {%- endfor -%}
+        </div>
 
-          {% render 'pagination', paginate: paginate %}
-        {%- endpaginate -%}
-      </div>
+        {% render 'pagination', paginate: paginate %}
+      {%- endpaginate -%}
     {%- endif -%}
   {%- endif -%}
 </section>

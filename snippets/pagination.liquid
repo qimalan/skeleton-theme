@@ -4,7 +4,7 @@ Renders accessible pagination controls.
 {% enddoc %}
 
 {%- if paginate.pages > 1 -%}
-  <nav class="pagination" role="navigation" aria-label="Pagination">
+  <nav class="pagination" role="navigation" aria-label="{{ 'pagination.label' | t }}">
     {%- if paginate.previous -%}
       <a class="pagination__link pagination__link--previous" href="{{ paginate.previous.url }}">
         {% render 'icon', icon: 'arrow-left' %}

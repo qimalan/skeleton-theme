@@ -4,8 +4,8 @@
     <h1>{{ blog.title }}</h1>
   </div>
 
-  <div class="cards-grid">
-    {%- paginate blog.articles by 12 -%}
+  {%- paginate blog.articles by 12 -%}
+    <div class="cards-grid">
       {%- for article in blog.articles -%}
         <article class="card card--surface">
           {%- if article.image != blank -%}
@@ -17,10 +17,10 @@
           </div>
         </article>
       {%- endfor -%}
+    </div>
 
-      {% render 'pagination', paginate: paginate %}
-    {%- endpaginate -%}
-  </div>
+    {% render 'pagination', paginate: paginate %}
+  {%- endpaginate -%}
 </section>
 
 {% schema %}

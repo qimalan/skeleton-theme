@@ -27,9 +27,90 @@
         {%- endfor -%}
         {% render 'pagination', paginate: paginate %}
       {% endpaginate %}
+
+      {% form 'new_comment', article, class: 'article-comments__form' %}
+        <h2>{{ 'blog.comment_form_title' | t }}</h2>
+
+        {%- if form.posted_successfully? -%}
+          <p class="article-comments__message" role="status">
+            {%- if blog.moderated? -%}
+              {{ 'blog.comment_success_moderated' | t }}
+            {%- else -%}
+              {{ 'blog.comment_success' | t }}
+            {%- endif -%}
+          </p>
+        {%- endif -%}
+
+        {{ form.errors | default_errors }}
+
+        <div class="article-comments__fields">
+          <label class="field" for="CommentForm-author">
+            <span>{{ 'blog.comment_form_name' | t }}</span>
+            <input
+              id="CommentForm-author"
+              class="field__input"
+              type="text"
+              name="comment[author]"
+              autocomplete="name"
+              value="{{ form.author }}"
+              required
+            >
+          </label>
+
+          <label class="field" for="CommentForm-email">
+            <span>{{ 'blog.comment_form_email' | t }}</span>
+            <input
+              id="CommentForm-email"
+              class="field__input"
+              type="email"
+              name="comment[email]"
+              autocomplete="email"
+              value="{{ form.email }}"
+              required
+            >
+          </label>
+        </div>
+
+        <label class="field" for="CommentForm-body">
+          <span>{{ 'blog.comment_form_body' | t }}</span>
+          <textarea id="CommentForm-body" class="field__input" name="comment[body]" rows="6" required>{{ form.body }}</textarea>
+        </label>
+
+        <button class="button" type="submit">{{ 'blog.comment_form_submit' | t }}</button>
+      {% endform %}
     </section>
   {%- endif -%}
 </article>
+
+{% stylesheet %}
+  .article-comments {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .article-comments__form {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .article-comments__fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .article-comments__message {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  @media (max-width: 749px) {
+    .article-comments__fields {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {

@@ -11,12 +11,14 @@
     "collections": "Collections",
     "footer": "Footer",
     "header": "Header",
+    "menu": "Menu",
     "page": "Page",
     "password": "Password",
     "product": "Product",
     "search": "Search"
   },
   "pagination": {
+    "label": "Pagination",
     "previous": "Previous",
     "next": "Next",
     "pages": "Pages"
@@ -51,10 +53,12 @@
     "title": "Blog",
     "article_comments": "Comments",
     "article_metadata_html": "{{ date }} by {{ author }}",
+    "comment_success": "Thanks, your comment has been posted.",
+    "comment_success_moderated": "Thanks, your comment has been submitted and will appear after approval.",
     "comment_form_body": "Comment",
     "comment_form_email": "Email",
     "comment_form_name": "Name",
-    "comment_form_submit": "Post",
+    "comment_form_submit": "Post comment",
     "comment_form_title": "Add a comment"
   },
   "cart": {
@@ -75,6 +79,18 @@
   "collections": {
     "title": "Collections"
   },
+  "featured_product": {
+    "eyebrow": "Featured product",
+    "title": "Featured product"
+  },
+  "contact": {
+    "email": "Email",
+    "message": "Message",
+    "name": "Name",
+    "phone": "Phone",
+    "submit": "Send message",
+    "success": "Thanks, your message has been sent."
+  },
   "gift_card": {
     "add_to_apple_wallet": "Add to Apple Wallet",
     "card": "Gift card",
@@ -86,6 +102,17 @@
     "title": "This shop is private",
     "password": "Password",
     "enter": "Enter"
+  },
+  "newsletter": {
+    "eyebrow": "Newsletter",
+    "email": "Email address",
+    "submit": "Subscribe",
+    "success": "Thanks for subscribing."
+  },
+  "social": {
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "twitter": "X / Twitter"
   },
   "search": {
     "title": "Search",

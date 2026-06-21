@@ -1,6 +1,6 @@
 <section class="page-width newsletter-section">
   <div class="section-heading">
-    <p class="section-heading__eyebrow">Newsletter</p>
+    <p class="section-heading__eyebrow">{{ 'newsletter.eyebrow' | t }}</p>
     <h2>{{ section.settings.heading }}</h2>
     {%- if section.settings.text != blank -%}
       <div class="section-heading__text rte">{{ section.settings.text }}</div>
@@ -9,11 +9,25 @@
 
   {% form 'customer', class: 'newsletter-section__form' %}
     <input type="hidden" name="contact[tags]" value="newsletter">
+    {%- if form.posted_successfully? -%}
+      <p class="newsletter-section__message" role="status">{{ 'newsletter.success' | t }}</p>
+    {%- endif -%}
+
+    {{ form.errors | default_errors }}
+
     <label class="field">
-      <span class="visually-hidden">Email</span>
-      <input class="field__input" type="email" name="contact[email]" autocomplete="email" placeholder="Email address" required>
+      <span class="visually-hidden">{{ 'newsletter.email' | t }}</span>
+      <input
+        class="field__input"
+        type="email"
+        name="contact[email]"
+        autocomplete="email"
+        value="{{ form.email }}"
+        placeholder="{{ 'newsletter.email' | t }}"
+        required
+      >
     </label>
-    <button class="button" type="submit">Subscribe</button>
+    <button class="button" type="submit">{{ 'newsletter.submit' | t }}</button>
   {% endform %}
 </section>
 
@@ -27,6 +41,16 @@
 
   .newsletter-section__form .field {
     flex: 1 1 18rem;
+  }
+
+  .newsletter-section__message,
+  .newsletter-section__form .errors {
+    flex-basis: 100%;
+  }
+
+  .newsletter-section__message {
+    color: var(--color-accent);
+    font-weight: 600;
   }
 {% endstylesheet %}
 

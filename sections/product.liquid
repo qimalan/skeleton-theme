@@ -2,15 +2,19 @@
   assign current_variant = product.selected_or_first_available_variant
 -%}
 
-<section class="page-width product-page">
+<section class="page-width product-page" data-product-root>
   <div class="product-page__grid">
     <div class="product-page__media">
       {%- if product.media != blank -%}
         <div class="product-page__gallery">
           {%- for media in product.media limit: 6 -%}
-            {%- if media.media_type == 'image' -%}
-              {% render 'image', image: media, width: 1600, height: 1600, crop: 'center' %}
-            {%- endif -%}
+            {%- liquid
+              assign media_loading = 'lazy'
+              if forloop.first
+                assign media_loading = 'eager'
+              endif
+            -%}
+            {% render 'product-media', media: media, loading: media_loading %}
           {%- endfor -%}
         </div>
       {%- else -%}
@@ -24,7 +28,9 @@
         <h1>{{ product.title }}</h1>
       </div>
 
-      {% render 'price', product: product, show_compare_at_price: true %}
+      <div data-variant-price>
+        {% render 'price', product: product, variant: current_variant, show_compare_at_price: true %}
+      </div>
 
       {%- if product.description != blank -%}
         <div class="rte">{{ product.description }}</div>
@@ -33,35 +39,33 @@
       {%- form 'product', product, class: 'product-form' -%}
         <input type="hidden" name="id" value="{{ current_variant.id }}">
 
-        {%- if product.has_only_default_variant == false -%}
-          <variant-selects class="product-form__variants">
-            {%- for option in product.options_with_values -%}
-              <label class="field">
-                <span>{{ option.name }}</span>
-                <select class="field__input" name="options[{{ option.name | escape }}]">
-                  {%- for value in option.values -%}
-                    <option value="{{ value }}" {% if value == option.selected_value %}selected{% endif %}>
-                      {{ value }}
-                    </option>
-                  {%- endfor -%}
-                </select>
-              </label>
-            {%- endfor -%}
+        {% render 'variant-picker', product: product, id_prefix: section.id %}
 
-            <script type="application/json">
-              {{ product.variants | json }}
-            </script>
-          </variant-selects>
-        {%- endif -%}
+        <label class="field product-form__quantity">
+          <span>{{ 'products.product.quantity.label' | t }}</span>
+          <input class="field__input" type="number" name="quantity" value="1" min="1">
+        </label>
 
         <div class="product-page__purchase">
-          <button class="button" type="submit" name="add" {% unless current_variant.available %}disabled{% endunless %}>
-            {{ 'products.product.add_to_cart' | t }}
+          <button
+            class="button"
+            type="submit"
+            name="add"
+            data-add-text="{{ 'products.product.add_to_cart' | t }}"
+            data-sold-out-text="{{ 'products.product.sold_out' | t }}"
+            {% unless current_variant.available %}disabled{% endunless %}
+          >
+            {%- if current_variant.available -%}
+              {{ 'products.product.add_to_cart' | t }}
+            {%- else -%}
+              {{ 'products.product.sold_out' | t }}
+            {%- endif -%}
           </button>
           <div
             data-variant-status
-            data-available-text="{{ 'products.product.add_to_cart' | t }}"
+            data-available-text=""
             data-unavailable-text="{{ 'products.product.sold_out' | t }}"
+            aria-live="polite"
           ></div>
         </div>
       {%- endform -%}
@@ -86,6 +90,18 @@
     gap: 1rem;
   }
 
+  .product-media,
+  .product-media .image,
+  .product-media .image__element,
+  .product-media__element {
+    width: 100%;
+  }
+
+  .product-media__element {
+    aspect-ratio: 1;
+    height: auto;
+  }
+
   .product-page__placeholder {
     width: 100%;
     height: auto;
@@ -99,6 +115,10 @@
   .product-page__purchase {
     display: grid;
     gap: 0.75rem;
+  }
+
+  .product-form__quantity {
+    max-width: 8rem;
   }
 
   @media (max-width: 749px) {

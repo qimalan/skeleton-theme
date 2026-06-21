@@ -4,31 +4,31 @@ Renders the theme contact form.
 
 {% form 'contact', id: 'ContactForm-' | append: section_id, class: 'contact-section__form' %}
   {%- if form.posted_successfully? -%}
-    <p class="contact-section__message">Thanks, your message has been sent.</p>
+    <p class="contact-section__message" role="status">{{ 'contact.success' | t }}</p>
   {%- endif -%}
 
   {{ form.errors | default_errors }}
 
   <div class="contact-section__grid">
     <label class="field">
-      <span>Name</span>
+      <span>{{ 'contact.name' | t }}</span>
       <input class="field__input" type="text" name="contact[name]" autocomplete="name" value="{% if form.name %}{{ form.name }}{% endif %}">
     </label>
     <label class="field">
-      <span>Email</span>
+      <span>{{ 'contact.email' | t }}</span>
       <input class="field__input" type="email" name="contact[email]" autocomplete="email" value="{% if form.email %}{{ form.email }}{% endif %}" required>
     </label>
     <label class="field">
-      <span>Phone</span>
+      <span>{{ 'contact.phone' | t }}</span>
       <input class="field__input" type="tel" name="contact[phone]" autocomplete="tel" value="{% if form.phone %}{{ form.phone }}{% endif %}">
     </label>
     <label class="field contact-section__full">
-      <span>Message</span>
-      <textarea class="field__input" name="contact[body]" rows="8">{% if form.body %}{{ form.body }}{% endif %}</textarea>
+      <span>{{ 'contact.message' | t }}</span>
+      <textarea class="field__input" name="contact[body]" rows="8" required>{% if form.body %}{{ form.body }}{% endif %}</textarea>
     </label>
   </div>
 
-  <button class="button" type="submit">Send message</button>
+  <button class="button" type="submit">{{ 'contact.submit' | t }}</button>
 {% endform %}
 
 {% stylesheet %}
@@ -45,6 +45,11 @@ Renders the theme contact form.
 
   .contact-section__full {
     grid-column: 1 / -1;
+  }
+
+  .contact-section__message {
+    color: var(--color-accent);
+    font-weight: 600;
   }
 
   @media (max-width: 749px) {
