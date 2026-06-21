@@ -1,0 +1,208 @@
+{%- liquid
+  assign image_loading = 'lazy'
+  if section.index == 1
+    assign image_loading = 'eager'
+  endif
+-%}
+
+<section class="page-width image-with-text-section image-with-text-section--{{ section.settings.layout }}">
+  <div class="image-with-text-section__grid image-with-text-section__grid--{{ section.settings.desktop_image_width }}">
+    <div class="image-with-text-section__media">
+      {%- if section.settings.image != blank -%}
+        {% render 'image', image: section.settings.image, width: 1600, height: 1600, crop: 'center', loading: image_loading %}
+      {%- else -%}
+        {{ 'detailed-apparel-1' | placeholder_svg_tag: 'image-with-text-section__placeholder' }}
+      {%- endif -%}
+    </div>
+
+    <div class="image-with-text-section__content">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'heading' -%}
+            <h2 class="{{ block.settings.heading_size }}" {{ block.shopify_attributes }}>
+              {{ block.settings.heading }}
+            </h2>
+          {%- when 'caption' -%}
+            <p class="section-heading__eyebrow" {{ block.shopify_attributes }}>
+              {{ block.settings.caption | escape }}
+            </p>
+          {%- when 'text' -%}
+            <div class="rte" {{ block.shopify_attributes }}>
+              {{ block.settings.text }}
+            </div>
+          {%- when 'button' -%}
+            {%- if block.settings.button_label != blank -%}
+              <a
+                {% if block.settings.button_link == blank %}
+                  role="link" aria-disabled="true"
+                {% else %}
+                  href="{{ block.settings.button_link }}"
+                {% endif %}
+                class="button{% if block.settings.button_style_secondary %} button--secondary{% endif %}"
+                {{ block.shopify_attributes }}
+              >
+                {{ block.settings.button_label | escape }}
+              </a>
+            {%- endif -%}
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .image-with-text-section__grid {
+    display: grid;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .image-with-text-section__grid--small {
+    grid-template-columns: 0.8fr 1.2fr;
+  }
+
+  .image-with-text-section__grid--medium {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .image-with-text-section__grid--large {
+    grid-template-columns: 1.2fr 0.8fr;
+  }
+
+  .image-with-text-section--text_first .image-with-text-section__media {
+    order: 2;
+  }
+
+  .image-with-text-section__content {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+
+  @media (max-width: 749px) {
+    .image-with-text-section__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .image-with-text-section--text_first .image-with-text-section__media {
+      order: 0;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Image with text",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "desktop_image_width",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" }
+      ],
+      "default": "medium",
+      "label": "Desktop image width"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "options": [
+        { "value": "image_first", "label": "Image first" },
+        { "value": "text_first", "label": "Text first" }
+      ],
+      "default": "image_first",
+      "label": "Layout"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "default": "Tell your story",
+          "label": "Heading"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "options": [
+            { "value": "h2", "label": "H2" },
+            { "value": "h1", "label": "H1" },
+            { "value": "h0", "label": "H0" }
+          ],
+          "default": "h1",
+          "label": "Heading size"
+        }
+      ]
+    },
+    {
+      "type": "caption",
+      "name": "Caption",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "caption",
+          "default": "About",
+          "label": "Caption"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>Use this for brand stories, process, service explanations, or simple editorial blocks.</p>",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "button_label",
+          "default": "Learn more",
+          "label": "Button label"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        },
+        {
+          "type": "checkbox",
+          "id": "button_style_secondary",
+          "default": false,
+          "label": "Secondary style"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image with text"
+    }
+  ]
+}
+{% endschema %}

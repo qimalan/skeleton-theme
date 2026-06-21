@@ -1,0 +1,111 @@
+{% doc %}
+Renders basic storefront filtering and sorting controls.
+@param {object} [results] - Result object.
+@param {boolean} [enable_filtering] - Show filters.
+@param {boolean} [enable_sorting] - Show sorting.
+{% enddoc %}
+
+{%- liquid
+  assign sort_by = results.sort_by | default: results.default_sort_by
+  assign results_url = results.url | default: request.path
+
+  if results.terms != blank
+    assign encoded_terms = results.terms | url_encode
+    assign results_url = routes.search_url | append: '?q=' | append: encoded_terms | append: '&options[prefix]=last'
+  endif
+-%}
+
+<div class="facets">
+  <form method="get" class="facets__form">
+    {%- if results.terms != blank -%}
+      <input type="hidden" name="q" value="{{ results.terms | escape }}">
+      <input type="hidden" name="options[prefix]" value="last">
+    {%- endif -%}
+
+    <div class="facets__toolbar">
+      <div class="facets__toolbar-group">
+        <span class="facets__label">{{ 'products.facets.filter_by_label' | t }}</span>
+        {%- if enable_sorting -%}
+          <label class="field facets__sort">
+            <span class="visually-hidden">{{ 'products.facets.sort_by_label' | t }}</span>
+            <select class="field__input" name="sort_by">
+              {%- for option in results.sort_options -%}
+                <option value="{{ option.value }}" {% if option.value == sort_by %}selected{% endif %}>
+                  {{ option.name | escape }}
+                </option>
+              {%- endfor -%}
+            </select>
+          </label>
+        {%- endif -%}
+      </div>
+
+      <div class="facets__actions">
+        <a class="link" href="{{ results_url }}">{{ 'products.facets.clear_all' | t }}</a>
+        <button class="button button--secondary" type="submit">{{ 'products.facets.apply' | t }}</button>
+      </div>
+    </div>
+
+    {%- if enable_filtering and results.filters != empty -%}
+      <div class="facets__groups">
+        {%- for filter in results.filters -%}
+          <details class="facets__group" {% if forloop.first %}open{% endif %}>
+            <summary class="facets__group-summary">
+              <span>{{ filter.label | escape }}</span>
+              <span class="facets__count">{{ filter.active_values.size }}</span>
+              {% render 'icon', icon: 'chevron-down' %}
+            </summary>
+
+            <div class="facets__group-body">
+              {%- case filter.type -%}
+                {%- when 'boolean', 'list' -%}
+                  <div class="facets__options">
+                    {%- for value in filter.values -%}
+                      {%- assign disabled = false -%}
+                      {%- if value.count == 0 and value.active == false -%}
+                        {%- assign disabled = true -%}
+                      {%- endif -%}
+                      <label class="facet-option{% if disabled %} facet-option--disabled{% endif %}">
+                        <input
+                          type="checkbox"
+                          name="{{ value.param_name }}"
+                          value="{{ value.value }}"
+                          {% if value.active %}checked{% endif %}
+                          {% if disabled %}disabled{% endif %}
+                        >
+                        <span class="facet-option__label">{{ value.label | escape }}</span>
+                        <span class="facet-option__count">{{ value.count }}</span>
+                      </label>
+                    {%- endfor -%}
+                  </div>
+                {%- when 'price_range' -%}
+                  {% render 'price-facet', filter: filter %}
+              {%- endcase -%}
+            </div>
+          </details>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </form>
+
+  {%- if results.filters != empty -%}
+    <div class="facets__active">
+      {%- for filter in results.filters -%}
+        {%- for value in filter.active_values -%}
+          <a class="facets__chip" href="{{ value.url_to_remove }}">
+            <span>{{ filter.label | escape }}: {{ value.label | escape }}</span>
+            {% render 'icon', icon: 'close' %}
+          </a>
+        {%- endfor -%}
+
+        {%- if filter.type == 'price_range' -%}
+          {%- if filter.min_value.value != blank or filter.max_value.value != blank -%}
+            <a class="facets__chip" href="{{ filter.url_to_remove }}">
+              <span>{{ filter.min_value.value | default: 0 | money }} - {{ filter.max_value.value | default: filter.range_max | money }}</span>
+              {% render 'icon', icon: 'close' %}
+            </a>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</div>

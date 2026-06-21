@@ -1,0 +1,228 @@
+<section
+  class="rich-text-section{% if section.settings.full_width %} rich-text-section--full{% endif %}"
+  style="
+    --rich-text-padding-top-mobile: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    --rich-text-padding-bottom-mobile: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+    --rich-text-padding-top-desktop: {{ section.settings.padding_top }}px;
+    --rich-text-padding-bottom-desktop: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="{% if section.settings.full_width == false %}page-width{% endif %}">
+    <div class="rich-text-section__inner section-{{ section.id }}-padding">
+      <div class="rich-text-section__blocks rich-text-section__blocks--{{ section.settings.desktop_content_position }} rich-text-section__blocks--text-{{ section.settings.content_alignment }}">
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'heading' -%}
+              <h2 class="rich-text-section__heading {{ block.settings.heading_size }}" {{ block.shopify_attributes }}>
+                {{ block.settings.heading }}
+              </h2>
+            {%- when 'text' -%}
+              <div class="rich-text-section__text rte" {{ block.shopify_attributes }}>
+                {{ block.settings.text }}
+              </div>
+            {%- when 'button' -%}
+              <div class="rich-text-section__buttons" {{ block.shopify_attributes }}>
+                {%- if block.settings.button_label != blank -%}
+                  <a
+                    {% if block.settings.button_link == blank %}
+                      role="link" aria-disabled="true"
+                    {% else %}
+                      href="{{ block.settings.button_link }}"
+                    {% endif %}
+                    class="button{% if block.settings.button_style_secondary %} button--secondary{% endif %}"
+                  >
+                    {{ block.settings.button_label | escape }}
+                  </a>
+                {%- endif -%}
+              </div>
+          {%- endcase -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .rich-text-section {
+    background: var(--color-surface);
+  }
+
+  .rich-text-section__inner {
+    padding-top: var(--rich-text-padding-top-mobile);
+    padding-bottom: var(--rich-text-padding-bottom-mobile);
+  }
+
+  @media screen and (min-width: 750px) {
+    .rich-text-section__inner {
+      padding-top: var(--rich-text-padding-top-desktop);
+      padding-bottom: var(--rich-text-padding-bottom-desktop);
+    }
+  }
+
+  .rich-text-section--full > .page-width,
+  .rich-text-section--full > * {
+    width: 100%;
+  }
+
+  .rich-text-section__inner {
+    display: grid;
+  }
+
+  .rich-text-section__blocks {
+    display: grid;
+    gap: 1rem;
+    max-width: 48rem;
+  }
+
+  .rich-text-section__blocks--left {
+    justify-items: start;
+  }
+
+  .rich-text-section__blocks--center {
+    justify-items: center;
+    margin-inline: auto;
+  }
+
+  .rich-text-section__blocks--right {
+    justify-items: end;
+    margin-inline-start: auto;
+  }
+
+  .rich-text-section__blocks--text-left {
+    text-align: left;
+  }
+
+  .rich-text-section__blocks--text-center {
+    text-align: center;
+  }
+
+  .rich-text-section__blocks--text-right {
+    text-align: right;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Rich text",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "desktop_content_position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center",
+      "label": "Desktop content position"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center",
+      "label": "Content alignment"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "default": true,
+      "label": "Full width"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 52
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "default": "A reusable starting point",
+          "label": "Heading"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "options": [
+            { "value": "h2", "label": "H2" },
+            { "value": "h1", "label": "H1" },
+            { "value": "h0", "label": "H0" }
+          ],
+          "default": "h0",
+          "label": "Heading size"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>Lightweight, reusable, and aimed at the kind of Shopify work solo freelancers get hired for most often.</p>",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "text",
+          "id": "button_label",
+          "default": "Learn more",
+          "label": "Button label"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        },
+        {
+          "type": "checkbox",
+          "id": "button_style_secondary",
+          "default": false,
+          "label": "Secondary style"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Rich text"
+    }
+  ]
+}
+{% endschema %}

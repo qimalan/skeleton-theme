@@ -1,0 +1,55 @@
+{% doc %}
+Renders the theme contact form.
+{% enddoc %}
+
+{% form 'contact', id: 'ContactForm-' | append: section_id, class: 'contact-section__form' %}
+  {%- if form.posted_successfully? -%}
+    <p class="contact-section__message">Thanks, your message has been sent.</p>
+  {%- endif -%}
+
+  {{ form.errors | default_errors }}
+
+  <div class="contact-section__grid">
+    <label class="field">
+      <span>Name</span>
+      <input class="field__input" type="text" name="contact[name]" autocomplete="name" value="{% if form.name %}{{ form.name }}{% endif %}">
+    </label>
+    <label class="field">
+      <span>Email</span>
+      <input class="field__input" type="email" name="contact[email]" autocomplete="email" value="{% if form.email %}{{ form.email }}{% endif %}" required>
+    </label>
+    <label class="field">
+      <span>Phone</span>
+      <input class="field__input" type="tel" name="contact[phone]" autocomplete="tel" value="{% if form.phone %}{{ form.phone }}{% endif %}">
+    </label>
+    <label class="field contact-section__full">
+      <span>Message</span>
+      <textarea class="field__input" name="contact[body]" rows="8">{% if form.body %}{{ form.body }}{% endif %}</textarea>
+    </label>
+  </div>
+
+  <button class="button" type="submit">Send message</button>
+{% endform %}
+
+{% stylesheet %}
+  .contact-section__form {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .contact-section__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .contact-section__full {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 749px) {
+    .contact-section__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}

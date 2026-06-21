@@ -1,0 +1,32 @@
+<section class="page-width custom-liquid-section">
+  <div class="custom-liquid-section__inner rte">
+    {{ section.settings.custom_liquid }}
+  </div>
+</section>
+
+{% stylesheet %}
+  .custom-liquid-section__inner {
+    display: grid;
+    gap: 1rem;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Custom liquid",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "Custom liquid"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom liquid"
+    }
+  ]
+}
+{% endschema %}

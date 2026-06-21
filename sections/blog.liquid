@@ -1,35 +1,31 @@
-{% comment %}
-  This section is used in the blog template to render the blog page listing all
-  articles within a blog.
+<section class="page-width">
+  <div class="section-heading">
+    <p class="section-heading__eyebrow">{{ 'blog.title' | t }}</p>
+    <h1>{{ blog.title }}</h1>
+  </div>
 
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/blog
-{% endcomment %}
+  <div class="cards-grid">
+    {%- paginate blog.articles by 12 -%}
+      {%- for article in blog.articles -%}
+        <article class="card card--surface">
+          {%- if article.image != blank -%}
+            {% render 'image', image: article.image, url: article.url, width: 1200, height: 800, crop: 'center' %}
+          {%- endif -%}
+          <div class="card__body">
+            <h3 class="card__title"><a href="{{ article.url }}">{{ article.title | escape }}</a></h3>
+            <p class="card__text">{{ article.excerpt_or_content | strip_html | truncatewords: 24 }}</p>
+          </div>
+        </article>
+      {%- endfor -%}
 
-<h1>{{ blog.title }}</h1>
-
-{% paginate blog.articles by 5 %}
-  {% for article in blog.articles %}
-    <div>
-      {% if article.image %}
-        {{ article.image | image_url: width: 1000 | image_tag }}
-      {% endif %}
-      <h2>
-        {{ article.title | link_to: article.url }}
-      </h2>
-      {% assign date = article.published_at | time_tag: format: 'date' %}
-      <p>{{ 'blog.article_metadata_html' | t: date: date, author: article.author }}</p>
-      <p>{{ article.excerpt }}</p>
-    </div>
-  {% endfor %}
-
-  {%- if paginate.pages > 1 -%}
-    {{- paginate | default_pagination -}}
-  {%- endif -%}
-{% endpaginate %}
+      {% render 'pagination', paginate: paginate %}
+    {%- endpaginate -%}
+  </div>
+</section>
 
 {% schema %}
 {
-  "name": "t:general.blog",
+  "name": "Blog",
   "settings": []
 }
 {% endschema %}

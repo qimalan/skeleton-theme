@@ -1,0 +1,98 @@
+{%- liquid
+  assign featured_product = section.settings.product
+-%}
+
+<section class="page-width featured-product-section">
+  {%- if featured_product != blank -%}
+    <div class="featured-product-section__grid featured-product-section__grid--{{ section.settings.media_position }}">
+      <div class="featured-product-section__media">
+        {%- if featured_product.featured_media != blank -%}
+          {% render 'image', image: featured_product.featured_media, width: 1600, height: 1600, crop: 'center' %}
+        {%- endif -%}
+      </div>
+
+      <div class="featured-product-section__content">
+        <div class="section-heading">
+          <p class="section-heading__eyebrow">{{ featured_product.vendor }}</p>
+          <h2>{{ featured_product.title }}</h2>
+        </div>
+
+        {% render 'price', product: featured_product, show_compare_at_price: true %}
+
+        {%- if featured_product.description != blank -%}
+          <div class="rte">{{ featured_product.description }}</div>
+        {%- endif -%}
+
+        {%- form 'product', featured_product, class: 'product-form' -%}
+          <input type="hidden" name="id" value="{{ featured_product.selected_or_first_available_variant.id }}">
+          <button class="button" type="submit" name="add" {% unless featured_product.selected_or_first_available_variant.available %}disabled{% endunless %}>
+            {{ 'products.product.add_to_cart' | t }}
+          </button>
+        {%- endform -%}
+      </div>
+    </div>
+  {%- else -%}
+    <div class="section-heading">
+      <p class="section-heading__eyebrow">Featured product</p>
+      <h2>Featured product</h2>
+    </div>
+  {%- endif -%}
+</section>
+
+{% stylesheet %}
+  .featured-product-section__grid {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .featured-product-section__grid--text_first .featured-product-section__media {
+    order: 2;
+  }
+
+  .featured-product-section__content {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (max-width: 749px) {
+    .featured-product-section__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .featured-product-section__grid--text_first .featured-product-section__media {
+      order: 0;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Featured product",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product"
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "options": [
+        { "value": "image_first", "label": "Image first" },
+        { "value": "text_first", "label": "Text first" }
+      ],
+      "default": "image_first",
+      "label": "Media position"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured product"
+    }
+  ]
+}
+{% endschema %}

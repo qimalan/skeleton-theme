@@ -1,0 +1,68 @@
+{% doc %}
+Renders a product card for grids and featured sections.
+@param {product} [card_product] - Product object.
+@param {string} [media_aspect_ratio] - Image ratio.
+@param {boolean} [show_vendor] - Show the vendor line.
+@param {string} [class] - Extra wrapper classes.
+{% enddoc %}
+
+{%- liquid
+  assign product_item = card_product
+  assign ratio = 1
+  assign ratio_setting = media_aspect_ratio | default: settings.card_image_ratio
+
+  case ratio_setting
+    when 'portrait'
+      assign ratio = 0.8
+    when 'landscape'
+      assign ratio = 1.25
+    else
+      assign ratio = 1
+  endcase
+
+  if product_item != blank and product_item.featured_media and ratio_setting == 'adapt'
+    assign ratio = product_item.featured_media.aspect_ratio | default: 1
+  endif
+
+  assign show_vendor = show_vendor | default: settings.show_vendor
+-%}
+
+<article class="card card--product{% if settings.card_style == 'surface' %} card--surface{% endif %}{% if class != blank %} {{ class }}{% endif %}">
+  {%- if product_item != blank -%}
+    <a class="card__media-link" href="{{ product_item.url }}" aria-label="{{ product_item.title | escape }}">
+      <div class="card__media" style="--card-ratio: {{ ratio }};">
+        {%- if product_item.featured_media -%}
+          {% render 'image', image: product_item.featured_media, width: 1200, height: 1200, crop: 'center' %}
+        {%- else -%}
+          {{ 'product-apparel-1' | placeholder_svg_tag: 'card__placeholder' }}
+        {%- endif -%}
+      </div>
+    </a>
+
+    <div class="card__body">
+      {%- if show_vendor and product_item.vendor != blank -%}
+        <p class="card__eyebrow">{{ product_item.vendor | escape }}</p>
+      {%- endif -%}
+
+      <h3 class="card__title">
+        <a href="{{ product_item.url }}">{{ product_item.title | escape }}</a>
+      </h3>
+
+      {% render 'price', product: product_item, show_compare_at_price: true %}
+    </div>
+
+    {%- if product_item.available == false -%}
+      <span class="card__badge">{{ 'products.product.sold_out' | t }}</span>
+    {%- elsif product_item.compare_at_price > product_item.price -%}
+      <span class="card__badge">{{ 'products.product.on_sale' | t }}</span>
+    {%- endif -%}
+  {%- else -%}
+    <div class="card__media">
+      {{ 'product-apparel-1' | placeholder_svg_tag: 'card__placeholder' }}
+    </div>
+    <div class="card__body">
+      <h3 class="card__title">{{ 'products.product.add_to_cart' | t }}</h3>
+      <p class="card__text">{{ 'general.product' | t }}</p>
+    </div>
+  {%- endif -%}
+</article>

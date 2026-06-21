@@ -1,0 +1,36 @@
+{% doc %}
+Renders the min and max inputs for a price range filter.
+@param {filter} filter - Price filter object.
+{% enddoc %}
+
+<div class="price-facet">
+  <label class="field">
+    <span class="visually-hidden">{{ 'products.facets.min_price' | t }}</span>
+    <input
+      class="field__input"
+      type="text"
+      inputmode="decimal"
+      name="{{ filter.min_value.param_name }}"
+      value="{% if filter.min_value.value %}{{ filter.min_value.value | money_without_currency }}{% endif %}"
+      placeholder="0"
+      data-pattern="\d| |,|\."
+      data-min="0"
+      data-max="{{ filter.range_max | money_without_currency }}"
+    >
+  </label>
+
+  <label class="field">
+    <span class="visually-hidden">{{ 'products.facets.max_price' | t }}</span>
+    <input
+      class="field__input"
+      type="text"
+      inputmode="decimal"
+      name="{{ filter.max_value.param_name }}"
+      value="{% if filter.max_value.value %}{{ filter.max_value.value | money_without_currency }}{% endif %}"
+      placeholder="{{ filter.range_max | money_without_currency }}"
+      data-pattern="\d| |,|\."
+      data-min="0"
+      data-max="{{ filter.range_max | money_without_currency }}"
+    >
+  </label>
+</div>

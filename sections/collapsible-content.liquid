@@ -1,0 +1,141 @@
+<section class="page-width collapsible-content-section">
+  <div class="section-heading" style="text-align: {{ section.settings.heading_alignment }};">
+    {%- if section.settings.caption != blank -%}
+      <p class="section-heading__eyebrow">{{ section.settings.caption }}</p>
+    {%- endif -%}
+    <h2>{{ section.settings.heading }}</h2>
+  </div>
+
+  <div class="collapsible-content-section__items collapsible-content-section__items--{{ section.settings.layout }}">
+    {%- for block in section.blocks -%}
+      <details class="collapsible-content-section__item" {% if section.settings.open_first_collapsible_row and forloop.first %}open{% endif %} {{ block.shopify_attributes }}>
+        <summary class="collapsible-content-section__summary">
+          <span>{{ block.settings.heading }}</span>
+          {% render 'icon', icon: 'chevron-down' %}
+        </summary>
+        <div class="collapsible-content-section__body rte">
+          {{ block.settings.row_content }}
+        </div>
+      </details>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .collapsible-content-section__items {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .collapsible-content-section__item {
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
+    overflow: clip;
+    background: var(--color-background);
+  }
+
+  .collapsible-content-section__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1rem;
+    font-weight: 600;
+  }
+
+  .collapsible-content-section__body {
+    padding: 0 1rem 1rem;
+  }
+
+  .collapsible-content-section__items--row .collapsible-content-section__item {
+    background: var(--color-surface);
+  }
+
+  .collapsible-content-section__items--section {
+    max-width: 48rem;
+    margin-inline: auto;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Collapsible content",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "caption",
+      "default": "FAQ",
+      "label": "Caption"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "default": "Common questions",
+      "label": "Heading"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center",
+      "label": "Heading alignment"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "row", "label": "Row" },
+        { "value": "section", "label": "Section" }
+      ],
+      "default": "section",
+      "label": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_first_collapsible_row",
+      "default": true,
+      "label": "Open first row"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "Question",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "row_content",
+          "default": "<p>Answer goes here.</p>",
+          "label": "Content"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collapsible content",
+      "blocks": [
+        {
+          "type": "row"
+        },
+        {
+          "type": "row"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,47 +1,50 @@
-{% comment %}
-  This section is used in the collection template to render collection page
-  listing all products within a collection.
+<section class="page-width">
+  <div class="section-heading">
+    <p class="section-heading__eyebrow">{{ 'collections.title' | t }}</p>
+    <h1>{{ collection.title }}</h1>
+    {%- if collection.description != blank -%}
+      <div class="section-heading__text rte">{{ collection.description }}</div>
+    {%- endif -%}
+  </div>
 
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
-{% endcomment %}
+  {% render 'facets', results: collection, enable_filtering: section.settings.enable_filtering, enable_sorting: section.settings.enable_sorting %}
 
-<h1>{{ collection.title }}</h1>
+  {%- paginate collection.products by section.settings.products_per_page -%}
+    <div class="product-grid">
+      {%- for product in collection.products -%}
+        {% render 'card-product', card_product: product %}
+      {%- endfor -%}
+    </div>
 
-<div class="collection-products">
-  {% paginate collection.products by 20 %}
-    {% for product in collection.products %}
-      <div class="collection-product">
-        {% if product.featured_image %}
-          {% render 'image',
-            class: 'collection-product__image',
-            image: product.featured_image,
-            url: product.url,
-            width: 400,
-            height: 400,
-            crop: 'center'
-          %}
-        {% endif %}
-        <div class="collection-product__content">
-          <p>{{ product.title | escape | link_to: product.url }}</p>
-          <p>{{ product.price | money }}</p>
-        </div>
-      </div>
-    {% endfor %}
-
-    {{ paginate | default_pagination }}
-  {% endpaginate %}
-</div>
-
-{% stylesheet %}
-  .collection-products {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
-  }
-{% endstylesheet %}
+    {% render 'pagination', paginate: paginate %}
+  {%- endpaginate -%}
+</section>
 
 {% schema %}
 {
-  "name": "t:general.collection",
-  "settings": []
+  "name": "Collection",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 8,
+      "max": 36,
+      "step": 4,
+      "default": 16,
+      "label": "Products per page"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "label": "Enable filtering",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sorting",
+      "label": "Enable sorting",
+      "default": true
+    }
+  ]
 }
 {% endschema %}

@@ -1,10 +1,54 @@
 {
+  "accessibility": {
+    "skip_to_content": "Skip to content"
+  },
+  "general": {
+    "navigation": "Navigation",
+    "404": "Not found",
+    "blog": "Blog",
+    "cart": "Cart",
+    "collection": "Collection",
+    "collections": "Collections",
+    "footer": "Footer",
+    "header": "Header",
+    "page": "Page",
+    "password": "Password",
+    "product": "Product",
+    "search": "Search"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "pages": "Pages"
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Add to cart",
+      "sold_out": "Sold out",
+      "on_sale": "On sale",
+      "quantity": {
+        "label": "Quantity"
+      }
+    },
+    "price": {
+      "from_price_html": "From {{ price }}"
+    },
+    "facets": {
+      "apply": "Apply",
+      "clear_all": "Clear all",
+      "filter_by_label": "Filter by",
+      "sort_by_label": "Sort by",
+      "min_price": "Minimum price",
+      "max_price": "Maximum price"
+    }
+  },
   "404": {
     "title": "404",
     "not_found": "Page not found.",
     "back_to_shopping": "Back to shopping"
   },
   "blog": {
+    "title": "Blog",
     "article_comments": "Comments",
     "article_metadata_html": "{{ date }} by {{ author }}",
     "comment_form_body": "Comment",
@@ -17,7 +61,8 @@
     "checkout": "Checkout",
     "title": "Cart",
     "update": "Update",
-    "remove": "Remove"
+    "remove": "Remove",
+    "empty": "Your cart is empty."
   },
   "customers": {
     "login": {

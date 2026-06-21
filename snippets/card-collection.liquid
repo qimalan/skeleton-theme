@@ -1,0 +1,56 @@
+{% doc %}
+Renders a collection card for collection grids.
+@param {collection} [card_collection] - Collection object.
+@param {string} [media_aspect_ratio] - Image ratio.
+@param {string} [class] - Extra wrapper classes.
+{% enddoc %}
+
+{%- liquid
+  assign collection_item = card_collection
+  assign ratio = 1
+  assign ratio_setting = media_aspect_ratio | default: settings.card_image_ratio
+
+  case ratio_setting
+    when 'portrait'
+      assign ratio = 0.8
+    when 'landscape'
+      assign ratio = 1.25
+    else
+      assign ratio = 1
+  endcase
+
+  if collection_item != blank and collection_item.featured_image and ratio_setting == 'adapt'
+    assign ratio = collection_item.featured_image.aspect_ratio | default: 1
+  endif
+-%}
+
+<article class="card card--collection{% if settings.card_style == 'surface' %} card--surface{% endif %}{% if class != blank %} {{ class }}{% endif %}">
+  {%- if collection_item != blank -%}
+    <a class="card__media-link" href="{{ collection_item.url }}" aria-label="{{ collection_item.title | escape }}">
+      <div class="card__media" style="--card-ratio: {{ ratio }};">
+        {%- if collection_item.featured_image -%}
+          {% render 'image', image: collection_item.featured_image, width: 1200, height: 1200, crop: 'center' %}
+        {%- else -%}
+          {{ 'collection-apparel-1' | placeholder_svg_tag: 'card__placeholder' }}
+        {%- endif -%}
+      </div>
+    </a>
+
+    <div class="card__body">
+      <h3 class="card__title">
+        <a href="{{ collection_item.url }}">{{ collection_item.title | escape }}</a>
+      </h3>
+
+      {%- if collection_item.description != blank -%}
+        <p class="card__text">{{ collection_item.description | strip_html | truncatewords: 18 }}</p>
+      {%- endif -%}
+    </div>
+  {%- else -%}
+    <div class="card__media">
+      {{ 'collection-apparel-1' | placeholder_svg_tag: 'card__placeholder' }}
+    </div>
+    <div class="card__body">
+      <h3 class="card__title">{{ 'collections.title' | t }}</h3>
+    </div>
+  {%- endif -%}
+</article>

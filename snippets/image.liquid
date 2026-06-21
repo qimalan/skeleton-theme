@@ -1,64 +1,30 @@
 {% doc %}
-  Renders a responsive image that might be wrapped in a link.
-
-  When `width`, `height` and `crop` are provided, the image will be rendered
-  with a fixed aspect ratio.
-
-  Serves as an example of how to use the `image_url` filter and `image_tag` filter
-  as well as how you can use LiquidDoc to document your code.
-
-  @param {image} image - The image to be rendered
-  @param {string} [url] - An optional destination URL for the image
-  @param {string} [class] - Optional class to be added to the image wrapper
-  @param {number} [width] - The highest resolution width of the image to be rendered
-  @param {number} [height] - The highest resolution height of the image to be rendered
-  @param {string} [crop] - The crop position of the image
-
-  @example
-  {% render 'image', image: product.featured_image %}
-  {% render 'image', image: product.featured_image, url: product.url %}
-  {% render 'image',
-    class: 'product__image',
-    image: product.featured_image,
-    url: product.url,
-    width: 1200,
-    height: 800,
-    crop: 'center',
-  %}
+Renders a responsive image, optionally wrapped in a link.
+@param {image} image - Image object.
+@param {string} [url] - Optional link URL.
+@param {string} [class] - Optional wrapper class.
+@param {number} [width] - Output width.
+@param {number} [height] - Output height.
+@param {string} [crop] - Crop position.
+@param {string} [loading] - Loading strategy.
 {% enddoc %}
 
-{% liquid
-  unless height
-    assign width = width | default: image.width
-  endunless
+{%- liquid
+  assign output_width = width | default: image.width
+  assign output_height = height | default: image.height
+  assign loading_strategy = loading | default: 'lazy'
+  assign wrapper = 'div'
 
-  if url
+  if url != blank
     assign wrapper = 'a'
-  else
-    assign wrapper = 'div'
   endif
-%}
+-%}
 
-<{{ wrapper }}
-  class="image {{ class }}"
-  {% if url %}
-    href="{{ url }}"
-  {% endif %}
->
-  {{ image | image_url: width: width, height: height, crop: crop | image_tag }}
-</{{ wrapper }}>
-
-{% stylesheet %}
-  .image {
-    display: block;
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-    height: auto;
-  }
-
-  .image > img {
-    width: 100%;
-    height: auto;
-  }
-{% endstylesheet %}
+{% if image != blank %}
+  <{{ wrapper }} class="image {{ class }}" {% if url != blank %}href="{{ url }}"{% endif %}>
+    {{ image
+      | image_url: width: output_width, height: output_height, crop: crop
+      | image_tag: class: 'image__element', loading: loading_strategy, alt: image.alt
+    }}
+  </{{ wrapper }}>
+{% endif %}

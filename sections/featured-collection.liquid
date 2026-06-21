@@ -1,0 +1,129 @@
+{%- liquid
+  assign collection_item = section.settings.collection
+  assign products_to_show = section.settings.products_to_show
+-%}
+
+<section class="page-width featured-collection">
+  <div class="section-heading">
+    <p class="section-heading__eyebrow">{{ section.settings.eyebrow }}</p>
+    <h2>{{ section.settings.title }}</h2>
+    {%- if section.settings.description != blank -%}
+      <div class="section-heading__text rte">{{ section.settings.description }}</div>
+    {%- elsif collection_item != blank and collection_item.description != blank -%}
+      <div class="section-heading__text rte">{{ collection_item.description }}</div>
+    {%- endif -%}
+  </div>
+
+  <div
+    class="product-grid featured-collection__grid"
+    style="--featured-columns-desktop: {{ section.settings.columns_desktop }}; --featured-columns-mobile: {{ section.settings.columns_mobile }};"
+  >
+    {%- if collection_item != blank and collection_item.products.size > 0 -%}
+      {%- for product in collection_item.products limit: products_to_show -%}
+        {% render 'card-product', card_product: product %}
+      {%- endfor -%}
+    {%- else -%}
+      {%- for i in (1..products_to_show) -%}
+        {% render 'card-product' %}
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.show_view_all and collection_item != blank -%}
+    <div class="featured-collection__footer">
+      <a class="button button--secondary" href="{{ collection_item.url }}">{{ section.settings.view_all_label }}</a>
+    </div>
+  {%- endif -%}
+</section>
+
+{% stylesheet %}
+  .featured-collection__grid {
+    grid-template-columns: repeat(var(--featured-columns-mobile), minmax(0, 1fr));
+  }
+
+  @media (min-width: 750px) {
+    .featured-collection__grid {
+      grid-template-columns: repeat(var(--featured-columns-desktop), minmax(0, 1fr));
+    }
+  }
+
+  .featured-collection__footer {
+    margin-top: 1.5rem;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Featured collection",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "default": "Featured collection",
+      "label": "Eyebrow"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Featured collection",
+      "label": "Title"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 12,
+      "step": 1,
+      "default": 8,
+      "label": "Products to show"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4,
+      "label": "Columns desktop"
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "min": 1,
+      "max": 2,
+      "step": 1,
+      "default": 2,
+      "label": "Columns mobile"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "default": true,
+      "label": "Show view all"
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "default": "View all",
+      "label": "View all label"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured collection"
+    }
+  ]
+}
+{% endschema %}

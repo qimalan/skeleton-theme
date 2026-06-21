@@ -1,76 +1,138 @@
-<header>
-  <h2 class="header__title">
-    {{ shop.name | link_to: routes.root_url }}
-  </h2>
-
-  <div class="header__menu">
-    {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
-  </div>
-
-  <div class="header__icons">
-    {% if shop.customer_accounts_enabled %}
-      <shopify-account menu="{{ section.settings.customer_account_menu }}">
-        {{ 'icon-account.svg' | inline_asset_content }}
-      </shopify-account>
-    {% endif %}
-
-    <a href="{{ routes.cart_url }}">
-      {% if cart.item_count > 0 %}
-        <sup>{{ cart.item_count }}</sup>
-      {% endif %}
-
-      {{ 'icon-cart.svg' | inline_asset_content }}
+<header class="site-header{% if settings.sticky_header %} site-header--sticky{% endif %}">
+  <div class="site-header__inner page-width">
+    <a class="site-header__brand" href="{{ routes.root_url }}">
+      {%- if settings.logo != blank -%}
+        {{ settings.logo | image_url: width: settings.logo_width | image_tag: class: 'site-header__logo', alt: shop.name }}
+      {%- else -%}
+        <span class="site-header__title">{{ shop.name }}</span>
+      {%- endif -%}
     </a>
+
+    <nav class="site-header__nav" aria-label="{{ 'general.navigation' | t }}">
+      {%- if section.settings.menu != blank -%}
+        <ul class="site-header__menu" role="list">
+          {%- for link in section.settings.menu.links -%}
+            <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </nav>
+
+    <div class="site-header__actions">
+      {%- if settings.show_search -%}
+        <a href="{{ routes.search_url }}" aria-label="{{ 'search.title' | t }}">
+          {% render 'icon', icon: 'search' %}
+        </a>
+      {%- endif -%}
+
+      {%- if settings.show_account and shop.customer_accounts_enabled -%}
+        <a href="{{ routes.account_url }}" aria-label="{{ 'customers.login.title' | t }}">
+          {% render 'icon', icon: 'account' %}
+        </a>
+      {%- endif -%}
+
+      <a href="{{ routes.cart_url }}" aria-label="{{ 'cart.title' | t }}">
+        {% render 'icon', icon: 'cart' %}
+        {%- if settings.show_cart_count and cart.item_count > 0 -%}
+          <span class="site-header__count">{{ cart.item_count }}</span>
+        {%- endif -%}
+      </a>
+    </div>
   </div>
 </header>
 
 {% stylesheet %}
-  header {
-    height: 5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  header a {
+  .site-header {
     position: relative;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-background);
+  }
+
+  .site-header--sticky {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .site-header__inner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    min-height: 4.5rem;
+  }
+
+  .site-header__brand {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
     text-decoration: none;
-    color: var(--color-foreground);
+  }
+
+  .site-header__logo {
+    width: var(--header-logo-width);
+    height: auto;
+  }
+
+  .site-header__title {
+    font-weight: 700;
+  }
+
+  .site-header__menu {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .site-header__menu a,
+  .site-header__actions a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    text-decoration: none;
+  }
+
+  .site-header__actions {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 0.75rem;
   }
-  header a sup {
-    position: absolute;
-    left: 100%;
-    overflow: hidden;
-    max-width: var(--page-margin);
+
+  .site-header__count {
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding-inline: 0.35rem;
+    border-radius: 999px;
+    background: var(--color-accent);
+    color: var(--color-background);
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    text-align: center;
   }
-  header svg {
-    width: 2rem;
-  }
-  header .header__menu,
-  header .header__icons {
-    display: flex;
-    gap: 1rem;
+
+  @media (max-width: 749px) {
+    .site-header__inner {
+      grid-template-columns: 1fr auto;
+    }
+
+    .site-header__nav {
+      display: none;
+    }
   }
 {% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:general.header",
+  "name": "Header",
   "settings": [
     {
       "type": "link_list",
       "id": "menu",
-      "label": "t:labels.menu"
-    },
-    {
-      "type": "link_list",
-      "id": "customer_account_menu",
-      "label": "t:labels.customer_account_menu",
-      "default": "customer-account-main-menu"
+      "label": "Menu"
     }
   ]
 }

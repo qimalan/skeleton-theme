@@ -1,52 +1,116 @@
-{% comment %}
-  This section is used in the product template to render product page with
-  media, content, and add-to-cart form.
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+-%}
 
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/product
-{% endcomment %}
+<section class="page-width product-page">
+  <div class="product-page__grid">
+    <div class="product-page__media">
+      {%- if product.media != blank -%}
+        <div class="product-page__gallery">
+          {%- for media in product.media limit: 6 -%}
+            {%- if media.media_type == 'image' -%}
+              {% render 'image', image: media, width: 1600, height: 1600, crop: 'center' %}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- else -%}
+        {{ 'product-apparel-1' | placeholder_svg_tag: 'product-page__placeholder' }}
+      {%- endif -%}
+    </div>
 
-<div class="product-images">
-  {% for image in product.images %}
-    {% render 'image', class: 'product-image', image: image %}
-  {% endfor %}
-</div>
+    <div class="product-page__content">
+      <div class="section-heading">
+        <p class="section-heading__eyebrow">{{ product.vendor }}</p>
+        <h1>{{ product.title }}</h1>
+      </div>
 
-<div class="product-info">
-  <h1>{{ product.title }}</h1>
-  <p>{{ product.price | money }}</p>
-  <p>{{ product.description }}</p>
-</div>
+      {% render 'price', product: product, show_compare_at_price: true %}
 
-<div class="product-form">
-  {% form 'product', product %}
-    {% assign current_variant = product.selected_or_first_available_variant %}
+      {%- if product.description != blank -%}
+        <div class="rte">{{ product.description }}</div>
+      {%- endif -%}
 
-    <select name="id">
-      {% for variant in product.variants %}
-        <option
-          value="{{ variant.id }}"
-          {% if variant == current_variant %}
-            selected="selected"
-          {% endif %}
-        >
-          {{ variant.title }} - {{ variant.price | money }}
-        </option>
-      {% endfor %}
-    </select>
+      {%- form 'product', product, class: 'product-form' -%}
+        <input type="hidden" name="id" value="{{ current_variant.id }}">
 
-    <input type="text" name="quantity" min="1" value="1">
+        {%- if product.has_only_default_variant == false -%}
+          <variant-selects class="product-form__variants">
+            {%- for option in product.options_with_values -%}
+              <label class="field">
+                <span>{{ option.name }}</span>
+                <select class="field__input" name="options[{{ option.name | escape }}]">
+                  {%- for value in option.values -%}
+                    <option value="{{ value }}" {% if value == option.selected_value %}selected{% endif %}>
+                      {{ value }}
+                    </option>
+                  {%- endfor -%}
+                </select>
+              </label>
+            {%- endfor -%}
 
-    <input type="submit" value="Add to cart">
-    {{ form | payment_button }}
-  {% endform %}
-</div>
+            <script type="application/json">
+              {{ product.variants | json }}
+            </script>
+          </variant-selects>
+        {%- endif -%}
+
+        <div class="product-page__purchase">
+          <button class="button" type="submit" name="add" {% unless current_variant.available %}disabled{% endunless %}>
+            {{ 'products.product.add_to_cart' | t }}
+          </button>
+          <div
+            data-variant-status
+            data-available-text="{{ 'products.product.add_to_cart' | t }}"
+            data-unavailable-text="{{ 'products.product.sold_out' | t }}"
+          ></div>
+        </div>
+      {%- endform -%}
+
+      {%- if product.metafields.custom.specs != blank -%}
+        <div class="rte">{{ product.metafields.custom.specs | metafield_tag }}</div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .product-page__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .product-page__gallery {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .product-page__placeholder {
+    width: 100%;
+    height: auto;
+  }
+
+  .product-form {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .product-page__purchase {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 749px) {
+    .product-page__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:general.product",
-  "settings": [],
-  "disabled_on": {
-    "groups": ["header", "footer"]
-  }
+  "name": "Product",
+  "settings": []
 }
 {% endschema %}

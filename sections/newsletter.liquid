@@ -1,0 +1,57 @@
+<section class="page-width newsletter-section">
+  <div class="section-heading">
+    <p class="section-heading__eyebrow">Newsletter</p>
+    <h2>{{ section.settings.heading }}</h2>
+    {%- if section.settings.text != blank -%}
+      <div class="section-heading__text rte">{{ section.settings.text }}</div>
+    {%- endif -%}
+  </div>
+
+  {% form 'customer', class: 'newsletter-section__form' %}
+    <input type="hidden" name="contact[tags]" value="newsletter">
+    <label class="field">
+      <span class="visually-hidden">Email</span>
+      <input class="field__input" type="email" name="contact[email]" autocomplete="email" placeholder="Email address" required>
+    </label>
+    <button class="button" type="submit">Subscribe</button>
+  {% endform %}
+</section>
+
+{% stylesheet %}
+  .newsletter-section__form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    max-width: 34rem;
+  }
+
+  .newsletter-section__form .field {
+    flex: 1 1 18rem;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "Join the list",
+      "label": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Newsletter"
+    }
+  ]
+}
+{% endschema %}

@@ -1,18 +1,34 @@
+{% doc %}
+Outputs the theme-wide CSS variables and font faces.
+{% enddoc %}
+
+{%- liquid
+  assign body_font_bold = settings.type_primary_font | font_modify: 'weight', 'bold'
+  assign body_font_italic = settings.type_primary_font | font_modify: 'style', 'italic'
+  assign body_font_bold_italic = body_font_bold | font_modify: 'style', 'italic'
+-%}
+
 {% style %}
-  {% # Loads all font variantions with display: swap %}
   {{ settings.type_primary_font | font_face: font_display: 'swap' }}
-  {{ settings.type_primary_font | font_modify: 'weight', 'bold' | font_face: font_display: 'swap' }}
-  {{ settings.type_primary_font | font_modify: 'weight', 'bold' | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
-  {{ settings.type_primary_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
+  {{ body_font_bold | font_face: font_display: 'swap' }}
+  {{ body_font_italic | font_face: font_display: 'swap' }}
+  {{ body_font_bold_italic | font_face: font_display: 'swap' }}
 
   :root {
-    --font-primary--family: {{ settings.type_primary_font.family }}, {{ settings.type_primary_font.fallback_families }};
-    --font-primary--style: {{ settings.type_primary_font.style }};
-    --font-primary--weight: {{ settings.type_primary_font.weight }};
+    --font-body-family: {{ settings.type_primary_font.family }}, {{ settings.type_primary_font.fallback_families }};
+    --font-body-style: {{ settings.type_primary_font.style }};
+    --font-body-weight: {{ settings.type_primary_font.weight }};
     --page-width: {{ settings.max_page_width }};
-    --page-margin: {{ settings.min_page_margin }}px;
-    --color-background: {{ settings.background_color }};
-    --color-foreground: {{ settings.foreground_color }};
-    --style-border-radius-inputs: {{ settings.input_corner_radius }}px;
+    --page-margin: {{ settings.page_margin }}px;
+    --color-background: {{ settings.color_background }};
+    --color-foreground: {{ settings.color_foreground }};
+    --color-accent: {{ settings.color_accent }};
+    --color-surface: {{ settings.color_surface }};
+    --color-border: {{ settings.color_border }};
+    --color-muted: {{ settings.color_muted }};
+    --button-radius: {{ settings.button_radius }}px;
+    --input-radius: {{ settings.input_radius }}px;
+    --card-radius: {{ settings.card_radius }}px;
+    --header-logo-width: {{ settings.logo_width }}px;
   }
 {% endstyle %}

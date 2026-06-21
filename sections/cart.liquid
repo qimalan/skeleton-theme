@@ -1,37 +1,85 @@
-{% comment %}
-  This section is used in the cart template to render /cart page with an
-  overview of the items in customer's cart.
+<section class="page-width cart-page">
+  <div class="section-heading">
+    <p class="section-heading__eyebrow">{{ 'cart.title' | t }}</p>
+    <h1>{{ 'cart.title' | t }}</h1>
+  </div>
 
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/cart
-{% endcomment %}
+  {%- if cart.item_count == 0 -%}
+    <p>{{ 'cart.empty' | t }}</p>
+    <a class="button" href="{{ routes.all_products_collection_url }}">{{ '404.back_to_shopping' | t }}</a>
+  {%- else -%}
+    <form action="{{ routes.cart_url }}" method="post">
+      <div class="cart-page__items">
+        {%- for item in cart.items -%}
+          <article class="card card--surface">
+            <div class="card__body">
+              <div class="cart-page__item">
+                {%- if item.image != blank -%}
+                  {% render 'image', image: item.image, url: item.url, width: 400, height: 400, crop: 'center' %}
+                {%- endif -%}
+                <div>
+                  <h3 class="card__title"><a href="{{ item.url }}">{{ item.product.title }}</a></h3>
+                  <p class="card__text">{{ item.final_line_price | money }}</p>
+                  {%- unless item.product.has_only_default_variant -%}
+                    <p class="card__text">{{ item.variant.title }}</p>
+                  {%- endunless -%}
+                </div>
+              </div>
 
-<h1>{{ 'cart.title' | t }}</h1>
+              <label class="field cart-page__quantity">
+                <span>{{ 'products.product.quantity.label' | t }}</span>
+                <input class="field__input" type="number" name="updates[]" value="{{ item.quantity }}" min="0">
+              </label>
 
-<form action="{{ routes.cart_url }}" method="post">
-  <table>
-    {% for item in cart.items %}
-      <tr>
-        <td>
-          {% render 'image', image: item.image, url: item.url %}
-        </td>
-        <td>
-          <p>{{ item.product.title }}</p>
-          {{ 'cart.remove' | t | link_to: item.url_to_remove }}
-        </td>
-        <td>
-          <input type="text" name="updates[]" value="{{ item.quantity }}">
-          <input type="submit" value="{{ 'cart.update' | t }}">
-        </td>
-      </tr>
-    {% endfor %}
-  </table>
+              <a class="link" href="{{ item.url_to_remove }}">{{ 'cart.remove' | t }}</a>
+            </div>
+          </article>
+        {%- endfor -%}
+      </div>
 
-  <input type="submit" name="checkout" value="{{ 'cart.checkout' | t }}">
-</form>
+      <div class="cart-page__footer">
+        <button class="button button--secondary" type="submit" name="update">{{ 'cart.update' | t }}</button>
+        <button class="button" type="submit" name="checkout">{{ 'cart.checkout' | t }}</button>
+      </div>
+    </form>
+  {%- endif -%}
+</section>
+
+{% stylesheet %}
+  .cart-page__items {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .cart-page__item {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .cart-page__footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+  }
+
+  .cart-page__quantity {
+    max-width: 8rem;
+  }
+
+  @media (max-width: 749px) {
+    .cart-page__item {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:general.cart",
+  "name": "Cart",
   "settings": []
 }
 {% endschema %}
