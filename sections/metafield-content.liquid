@@ -1,0 +1,127 @@
+{%- liquid
+  assign source = blank
+  assign namespace = section.settings.namespace | strip
+  assign key = section.settings.key | strip
+
+  case section.settings.source
+    when 'product'
+      assign source = product
+    when 'collection'
+      assign source = collection
+    when 'page'
+      assign source = page
+    when 'article'
+      assign source = article
+  endcase
+
+  assign metafield_value = blank
+  if source != blank and namespace != blank and key != blank
+    assign metafield_value = source.metafields[namespace][key]
+  endif
+-%}
+
+{%- if metafield_value != blank or section.settings.show_empty_state -%}
+  <section class="page-width metafield-content-section">
+    {%- if section.settings.heading != blank or section.settings.text != blank -%}
+      <div class="section-heading section-heading--{{ section.settings.heading_alignment }}">
+        {%- if section.settings.heading != blank -%}
+          <h2>{{ section.settings.heading }}</h2>
+        {%- endif -%}
+        {%- if section.settings.text != blank -%}
+          <div class="section-heading__text rte">{{ section.settings.text }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="metafield-content-section__body rte">
+      {%- if metafield_value != blank -%}
+        {%- if section.settings.metaobject_field != blank -%}
+          {{ metafield_value | metafield_tag: field: section.settings.metaobject_field }}
+        {%- else -%}
+          {{ metafield_value | metafield_tag }}
+        {%- endif -%}
+      {%- else -%}
+        <p>{{ 'general.empty_dynamic_content' | t }}</p>
+      {%- endif -%}
+    </div>
+  </section>
+{%- endif -%}
+
+{% stylesheet %}
+  .metafield-content-section__body {
+    max-width: 54rem;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Metafield content",
+  "tag": "section",
+  "class": "section-metafield-content",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "default": "Details",
+      "label": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left",
+      "label": "Heading alignment"
+    },
+    {
+      "type": "select",
+      "id": "source",
+      "options": [
+        { "value": "product", "label": "Product" },
+        { "value": "collection", "label": "Collection" },
+        { "value": "page", "label": "Page" },
+        { "value": "article", "label": "Article" }
+      ],
+      "default": "product",
+      "label": "Source"
+    },
+    {
+      "type": "text",
+      "id": "namespace",
+      "default": "custom",
+      "label": "Namespace"
+    },
+    {
+      "type": "text",
+      "id": "key",
+      "default": "details",
+      "label": "Key"
+    },
+    {
+      "type": "text",
+      "id": "metaobject_field",
+      "label": "Metaobject field",
+      "info": "Use for metaobject references, for example name."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_empty_state",
+      "default": false,
+      "label": "Show empty state"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Metafield content"
+    }
+  ]
+}
+{% endschema %}

@@ -12,7 +12,23 @@
       {%- if section.settings.menu != blank -%}
         <ul class="site-header__menu" role="list">
           {%- for link in section.settings.menu.links -%}
-            <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
+            <li>
+              {%- if link.links != blank -%}
+                <details class="site-header__menu-item">
+                  <summary>
+                    <span>{{ link.title | escape }}</span>
+                    {% render 'icon', icon: 'chevron-down' %}
+                  </summary>
+                  <ul class="site-header__submenu" role="list">
+                    {%- for child_link in link.links -%}
+                      <li><a href="{{ child_link.url }}">{{ child_link.title | escape }}</a></li>
+                    {%- endfor -%}
+                  </ul>
+                </details>
+              {%- else -%}
+                <a href="{{ link.url }}">{{ link.title | escape }}</a>
+              {%- endif -%}
+            </li>
           {%- endfor -%}
         </ul>
       {%- endif -%}
@@ -28,18 +44,77 @@
         <div class="site-header__mobile-panel">
           <ul class="site-header__mobile-list page-width" role="list">
             {%- for link in section.settings.menu.links -%}
-              <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
+              <li>
+                {%- if link.links != blank -%}
+                  <details>
+                    <summary>
+                      <span>{{ link.title | escape }}</span>
+                      {% render 'icon', icon: 'chevron-down' %}
+                    </summary>
+                    <ul role="list">
+                      {%- for child_link in link.links -%}
+                        <li><a href="{{ child_link.url }}">{{ child_link.title | escape }}</a></li>
+                      {%- endfor -%}
+                    </ul>
+                  </details>
+                {%- else -%}
+                  <a href="{{ link.url }}">{{ link.title | escape }}</a>
+                {%- endif -%}
+              </li>
             {%- endfor -%}
           </ul>
+          {%- if settings.show_localization -%}
+            <div class="site-header__mobile-localization page-width">
+              {% render 'localization-form', id_prefix: 'HeaderLocalization' %}
+            </div>
+          {%- endif -%}
         </div>
       </details>
     {%- endif -%}
 
     <div class="site-header__actions">
       {%- if settings.show_search -%}
-        <a href="{{ routes.search_url }}" aria-label="{{ 'search.title' | t }}">
-          {% render 'icon', icon: 'search' %}
-        </a>
+        <details class="site-header__search">
+          <summary aria-label="{{ 'search.title' | t }}">
+            {% render 'icon', icon: 'search' %}
+          </summary>
+          <div class="site-header__search-panel">
+            {%- if settings.predictive_search_enabled -%}
+              <predictive-search
+                class="predictive-search"
+                data-url="{{ routes.predictive_search_url }}"
+                data-results-text="{{ 'search.results' | t }}"
+                data-no-results-text="{{ 'search.no_results_plain' | t }}"
+              >
+            {%- endif -%}
+              <form action="{{ routes.search_url }}" method="get" role="search" class="predictive-search__form">
+                <input type="hidden" name="options[prefix]" value="last">
+                <label class="field" for="HeaderSearchInput">
+                  <span class="visually-hidden">{{ 'search.title' | t }}</span>
+                  <input
+                    id="HeaderSearchInput"
+                    class="field__input"
+                    type="search"
+                    name="q"
+                    autocomplete="off"
+                    placeholder="{{ 'search.placeholder' | t }}"
+                    data-predictive-search-input
+                  >
+                </label>
+                <button class="button" type="submit">{{ 'search.submit' | t }}</button>
+              </form>
+            {%- if settings.predictive_search_enabled -%}
+                <div class="predictive-search__results" data-predictive-search-results></div>
+              </predictive-search>
+            {%- endif -%}
+          </div>
+        </details>
+      {%- endif -%}
+
+      {%- if settings.show_localization -%}
+        <div class="site-header__localization">
+          {% render 'localization-form', id_prefix: 'HeaderDesktopLocalization' %}
+        </div>
       {%- endif -%}
 
       {%- if settings.show_account and shop.customer_accounts_enabled -%}
@@ -48,10 +123,16 @@
         </a>
       {%- endif -%}
 
-      <a href="{{ routes.cart_url }}" aria-label="{{ 'cart.title' | t }}">
+      <a
+        href="{{ routes.cart_url }}"
+        aria-label="{{ 'cart.title' | t }}"
+        {% if settings.cart_drawer_enabled %}data-cart-open{% endif %}
+      >
         {% render 'icon', icon: 'cart' %}
-        {%- if settings.show_cart_count and cart.item_count > 0 -%}
-          <span class="site-header__count">{{ cart.item_count }}</span>
+        {%- if settings.show_cart_count -%}
+          <span class="site-header__count" data-cart-count {% if cart.item_count == 0 %}hidden{% endif %}>
+            {{ cart.item_count }}
+          </span>
         {%- endif -%}
       </a>
     </div>
@@ -106,12 +187,36 @@
   }
 
   .site-header__menu a,
+  .site-header__menu summary,
   .site-header__mobile-list a,
+  .site-header__mobile-list summary,
+  .site-header__search summary,
   .site-header__actions a {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
     text-decoration: none;
+  }
+
+  .site-header__menu-item {
+    position: relative;
+  }
+
+  .site-header__submenu {
+    position: absolute;
+    inset-block-start: calc(100% + 0.75rem);
+    inset-inline-start: 0;
+    z-index: 12;
+    display: grid;
+    gap: 0.5rem;
+    min-width: 12rem;
+    padding: 0.9rem;
+    margin: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--card-radius);
+    background: var(--color-background);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.08);
+    list-style: none;
   }
 
   .site-header__mobile-menu {
@@ -146,10 +251,97 @@
     list-style: none;
   }
 
+  .site-header__mobile-list ul {
+    display: grid;
+    gap: 0.65rem;
+    padding-inline-start: 1rem;
+    margin-block: 0.75rem 0;
+    list-style: none;
+  }
+
   .site-header__actions {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+  }
+
+  .site-header__localization .localization-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .site-header__localization .field__input {
+    min-height: 2.5rem;
+    width: auto;
+    max-width: 11rem;
+    padding-block: 0.4rem;
+  }
+
+  .site-header__localization .button {
+    min-height: 2.5rem;
+    padding-block: 0.4rem;
+  }
+
+  .site-header__search {
+    position: relative;
+  }
+
+  .site-header__search summary,
+  .site-header__actions > a {
+    justify-content: center;
+    width: 2.5rem;
+    min-width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .site-header__search-panel {
+    position: absolute;
+    inset-block-start: calc(100% + 0.75rem);
+    inset-inline-end: 0;
+    z-index: 12;
+    width: min(28rem, calc(100vw - 2rem));
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--card-radius);
+    background: var(--color-background);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.08);
+  }
+
+  .predictive-search,
+  .predictive-search__form,
+  .predictive-search__results {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .predictive-search__form {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .predictive-search__list {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .predictive-search__link {
+    display: grid;
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  .predictive-search__image {
+    aspect-ratio: 1;
+    width: 3.25rem;
+    overflow: hidden;
+    border-radius: calc(var(--card-radius) * 0.5);
+    background: var(--color-surface);
+    object-fit: cover;
   }
 
   .site-header__count {
@@ -166,7 +358,14 @@
 
   @media (max-width: 749px) {
     .site-header__inner {
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 0.65rem;
+      min-height: 4rem;
+    }
+
+    .site-header__brand {
+      grid-column: 2;
+      justify-self: center;
     }
 
     .site-header__nav {
@@ -175,11 +374,49 @@
 
     .site-header__mobile-menu {
       display: block;
-      justify-self: end;
+      grid-column: 1;
+      grid-row: 1;
+      justify-self: start;
     }
 
     .site-header__actions {
+      grid-column: 3;
+      grid-row: 1;
+      gap: 0.35rem;
       justify-content: end;
+    }
+
+    .site-header__localization {
+      display: none;
+    }
+
+    .site-header__mobile-panel {
+      max-height: calc(100svh - 4rem);
+      overflow-y: auto;
+    }
+
+    .site-header__mobile-localization {
+      padding-block: 0 1rem;
+    }
+
+    .site-header__mobile-localization .localization-form {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .site-header__search {
+      position: static;
+    }
+
+    .site-header__search-panel {
+      position: absolute;
+      inset-inline: 1rem;
+      inset-block-start: calc(100% + 0.5rem);
+      width: auto;
+    }
+
+    .predictive-search__form {
+      grid-template-columns: 1fr;
     }
   }
 {% endstylesheet %}

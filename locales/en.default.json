@@ -15,7 +15,8 @@
     "page": "Page",
     "password": "Password",
     "product": "Product",
-    "search": "Search"
+    "search": "Search",
+    "empty_dynamic_content": "No dynamic content is available yet."
   },
   "pagination": {
     "label": "Pagination",
@@ -23,11 +24,26 @@
     "next": "Next",
     "pages": "Pages"
   },
+  "localization": {
+    "country_label": "Country/region",
+    "language_label": "Language",
+    "update": "Update"
+  },
   "products": {
     "product": {
       "add_to_cart": "Add to cart",
+      "quick_add": "Quick add",
+      "choose_options": "Choose options",
       "sold_out": "Sold out",
+      "available": "In stock",
+      "low_stock": "Only [count] left",
       "on_sale": "On sale",
+      "sku": "SKU",
+      "payment_methods": "Payment methods",
+      "shipping_policy_html": "Shipping and returns are covered in our <a href=\"{{ link }}\">shipping policy</a>.",
+      "checkout_note": "Taxes, duties, and shipping are calculated at checkout.",
+      "open_media": "Open media",
+      "media_gallery": "Media gallery",
       "quantity": {
         "label": "Quantity"
       }
@@ -63,8 +79,11 @@
   },
   "cart": {
     "checkout": "Checkout",
+    "close": "Close cart",
+    "subtotal": "Subtotal",
     "title": "Cart",
     "update": "Update",
+    "view_cart": "View cart",
     "remove": "Remove",
     "empty": "Your cart is empty."
   },
@@ -118,6 +137,9 @@
     "title": "Search",
     "placeholder": "Search articles, pages, or products",
     "submit": "Search",
+    "results": "Suggestions",
+    "view_all": "View all results",
+    "no_results_plain": "No results found.",
     "no_results_html": "No results found for {{ terms }}",
     "results_for_html": "{{ count }} results found for {{ terms }}"
   }

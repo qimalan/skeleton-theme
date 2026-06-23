@@ -1,0 +1,388 @@
+{%- liquid
+  assign banner_image = section.settings.image
+  assign image_loading = 'lazy'
+
+  if banner_image == blank
+    assign banner_image = section.settings.mobile_image
+  endif
+
+  if section.index == 1
+    assign image_loading = 'eager'
+  endif
+-%}
+
+<section
+  class="image-banner image-banner--{{ section.settings.height }} image-banner--{{ section.settings.content_position }} image-banner--text-{{ section.settings.content_alignment }}"
+  style="--image-banner-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};"
+>
+  <div class="image-banner__media">
+    {%- if banner_image != blank -%}
+      <picture>
+        {%- if section.settings.mobile_image != blank -%}
+          <source media="(max-width: 749px)" srcset="{{ section.settings.mobile_image | image_url: width: 900 }}">
+        {%- endif -%}
+        {{
+          banner_image
+          | image_url: width: 2400
+          | image_tag: class: 'image-banner__image', loading: image_loading, alt: banner_image.alt
+        }}
+      </picture>
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'image-banner__placeholder' }}
+    {%- endif -%}
+  </div>
+
+  <div class="image-banner__overlay"></div>
+
+  <div class="image-banner__content page-width">
+    <div class="image-banner__box">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'eyebrow' -%}
+            {%- if block.settings.text != blank -%}
+              <p class="section-heading__eyebrow" {{ block.shopify_attributes }}>{{ block.settings.text | escape }}</p>
+            {%- endif -%}
+          {%- when 'heading' -%}
+            {%- if block.settings.heading != blank -%}
+              <h2 class="image-banner__heading {{ block.settings.heading_size }}" {{ block.shopify_attributes }}>
+                {{ block.settings.heading }}
+              </h2>
+            {%- endif -%}
+          {%- when 'text' -%}
+            {%- if block.settings.text != blank -%}
+              <div class="image-banner__text rte" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+            {%- endif -%}
+          {%- when 'buttons' -%}
+            <div class="image-banner__buttons" {{ block.shopify_attributes }}>
+              {%- if block.settings.button_label_1 != blank -%}
+                <a
+                  {% if block.settings.button_link_1 == blank %}
+                    role="link" aria-disabled="true"
+                  {% else %}
+                    href="{{ block.settings.button_link_1 }}"
+                  {% endif %}
+                  class="button"
+                >
+                  {{ block.settings.button_label_1 | escape }}
+                </a>
+              {%- endif -%}
+
+              {%- if block.settings.button_label_2 != blank -%}
+                <a
+                  {% if block.settings.button_link_2 == blank %}
+                    role="link" aria-disabled="true"
+                  {% else %}
+                    href="{{ block.settings.button_link_2 }}"
+                  {% endif %}
+                  class="button button--secondary"
+                >
+                  {{ block.settings.button_label_2 | escape }}
+                </a>
+              {%- endif -%}
+            </div>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .image-banner {
+    position: relative;
+    display: grid;
+    min-height: clamp(28rem, 62vw, 44rem);
+    overflow: clip;
+    color: #ffffff;
+    isolation: isolate;
+  }
+
+  .image-banner--small {
+    min-height: clamp(22rem, 42vw, 32rem);
+  }
+
+  .image-banner--large {
+    min-height: clamp(34rem, 70vw, 52rem);
+  }
+
+  .image-banner__media,
+  .image-banner__media picture,
+  .image-banner__image,
+  .image-banner__placeholder,
+  .image-banner__overlay,
+  .image-banner__content {
+    grid-area: 1 / 1;
+  }
+
+  .image-banner__media,
+  .image-banner__media picture,
+  .image-banner__image,
+  .image-banner__placeholder {
+    width: 100%;
+    height: 100%;
+  }
+
+  .image-banner__image,
+  .image-banner__placeholder {
+    object-fit: cover;
+  }
+
+  .image-banner__overlay {
+    z-index: 1;
+    background: rgba(0, 0, 0, var(--image-banner-overlay-opacity));
+  }
+
+  .image-banner__content {
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    padding-block: clamp(3rem, 8vw, 6rem);
+  }
+
+  .image-banner--top-left .image-banner__content,
+  .image-banner--top-center .image-banner__content,
+  .image-banner--top-right .image-banner__content {
+    align-items: flex-start;
+  }
+
+  .image-banner--bottom-left .image-banner__content,
+  .image-banner--bottom-center .image-banner__content,
+  .image-banner--bottom-right .image-banner__content {
+    align-items: flex-end;
+  }
+
+  .image-banner--top-center .image-banner__content,
+  .image-banner--middle-center .image-banner__content,
+  .image-banner--bottom-center .image-banner__content {
+    justify-content: center;
+  }
+
+  .image-banner--top-right .image-banner__content,
+  .image-banner--middle-right .image-banner__content,
+  .image-banner--bottom-right .image-banner__content {
+    justify-content: flex-end;
+  }
+
+  .image-banner__box {
+    display: grid;
+    gap: 1rem;
+    max-width: 44rem;
+  }
+
+  .image-banner--text-center .image-banner__box {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .image-banner--text-right .image-banner__box {
+    justify-items: end;
+    text-align: right;
+  }
+
+  .image-banner__heading {
+    max-width: 12ch;
+    line-height: 0.98;
+  }
+
+  .image-banner__text {
+    max-width: 42rem;
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+  }
+
+  .image-banner__text > * {
+    max-width: none;
+  }
+
+  .image-banner__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .image-banner .button--secondary {
+    border-color: currentColor;
+    color: currentColor;
+  }
+
+  @media (max-width: 749px) {
+    .image-banner {
+      min-height: 32rem;
+    }
+
+    .image-banner__content {
+      align-items: flex-end;
+    }
+
+    .image-banner__box {
+      max-width: 100%;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Image banner",
+  "tag": "section",
+  "class": "section-image-banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile image"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" }
+      ],
+      "default": "medium",
+      "label": "Height"
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "options": [
+        { "value": "top-left", "label": "Top left" },
+        { "value": "top-center", "label": "Top center" },
+        { "value": "top-right", "label": "Top right" },
+        { "value": "middle-left", "label": "Middle left" },
+        { "value": "middle-center", "label": "Middle center" },
+        { "value": "middle-right", "label": "Middle right" },
+        { "value": "bottom-left", "label": "Bottom left" },
+        { "value": "bottom-center", "label": "Bottom center" },
+        { "value": "bottom-right", "label": "Bottom right" }
+      ],
+      "default": "middle-left",
+      "label": "Content position"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left",
+      "label": "Content alignment"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 35,
+      "label": "Overlay opacity"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "eyebrow",
+      "name": "Eyebrow",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "default": "New season",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "name": "Heading",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "default": "Build a sharper storefront",
+          "label": "Heading"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "options": [
+            { "value": "h2", "label": "H2" },
+            { "value": "h1", "label": "H1" },
+            { "value": "h0", "label": "H0" }
+          ],
+          "default": "h0",
+          "label": "Heading size"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>A compact theme starter for common Shopify launches, catalog refreshes, and conversion-focused landing pages.</p>",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "buttons",
+      "name": "Buttons",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "button_label_1",
+          "default": "Shop now",
+          "label": "First button label"
+        },
+        {
+          "type": "url",
+          "id": "button_link_1",
+          "label": "First button link"
+        },
+        {
+          "type": "text",
+          "id": "button_label_2",
+          "default": "Learn more",
+          "label": "Second button label"
+        },
+        {
+          "type": "url",
+          "id": "button_link_2",
+          "label": "Second button link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image banner",
+      "blocks": [
+        {
+          "type": "eyebrow"
+        },
+        {
+          "type": "heading"
+        },
+        {
+          "type": "text"
+        },
+        {
+          "type": "buttons"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

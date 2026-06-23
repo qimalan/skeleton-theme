@@ -42,7 +42,10 @@ Renders a lightweight select-based variant picker with formatted variant data.
             "options": {{ variant.options | json }},
             "price": {{ variant_price | json }},
             "compareAtPrice": {% if compare_at_price_value > variant.price %}{{ variant_compare_at_price | json }}{% else %}null{% endif %},
-            "sku": {{ variant.sku | json }}
+            "sku": {{ variant.sku | json }},
+            "inventoryManagement": {{ variant.inventory_management | json }},
+            "inventoryPolicy": {{ variant.inventory_policy | json }},
+            "inventoryQuantity": {{ variant.inventory_quantity | json }}
           }{% unless forloop.last %},{% endunless %}
         {%- endfor -%}
       ]

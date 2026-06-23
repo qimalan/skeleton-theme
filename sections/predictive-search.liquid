@@ -1,0 +1,88 @@
+{%- if predictive_search.performed -%}
+  {%- liquid
+    assign money_price = blank
+  -%}
+  <div class="predictive-search__result">
+    {%- assign result_count = predictive_search.resources.products.size
+      | plus: predictive_search.resources.collections.size
+      | plus: predictive_search.resources.pages.size
+      | plus: predictive_search.resources.articles.size
+      | plus: predictive_search.resources.queries.size
+    -%}
+
+    {%- if result_count > 0 -%}
+      <p class="predictive-search__heading">{{ 'search.results' | t }}</p>
+      <ul class="predictive-search__list" role="list" data-predictive-search-list>
+        {%- for product in predictive_search.resources.products limit: 4 -%}
+          {%- liquid
+            assign money_price = product.price | money
+            if settings.currency_code_enabled
+              assign money_price = product.price | money_with_currency
+            endif
+          -%}
+          <li>
+            <a class="predictive-search__link" href="{{ product.url }}" data-predictive-search-item>
+              {%- if product.featured_media != blank -%}
+                {{
+                  product.featured_media
+                  | image_url: width: 120
+                  | image_tag: class: 'predictive-search__image', loading: 'lazy', alt: product.featured_media.alt
+                }}
+              {%- else -%}
+                <span class="predictive-search__image"></span>
+              {%- endif -%}
+              <span>
+                <span>{{ product.title | escape }}</span>
+                <span class="card__text">{{ money_price }}</span>
+              </span>
+            </a>
+          </li>
+        {%- endfor -%}
+
+        {%- for collection in predictive_search.resources.collections limit: 3 -%}
+          <li><a class="predictive-search__text-link" href="{{ collection.url }}" data-predictive-search-item>{{ collection.title | escape }}</a></li>
+        {%- endfor -%}
+
+        {%- for page in predictive_search.resources.pages limit: 3 -%}
+          <li><a class="predictive-search__text-link" href="{{ page.url }}" data-predictive-search-item>{{ page.title | escape }}</a></li>
+        {%- endfor -%}
+
+        {%- for article in predictive_search.resources.articles limit: 3 -%}
+          <li><a class="predictive-search__text-link" href="{{ article.url }}" data-predictive-search-item>{{ article.title | escape }}</a></li>
+        {%- endfor -%}
+      </ul>
+
+      <a class="link" href="{{ routes.search_url }}?q={{ predictive_search.terms | url_encode }}&options[prefix]=last">
+        {{ 'search.view_all' | t }}
+      </a>
+    {%- else -%}
+      <p>{{ 'search.no_results_plain' | t }}</p>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .predictive-search__list {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .predictive-search__image {
+    aspect-ratio: 1;
+    width: 3.25rem;
+    overflow: hidden;
+    border-radius: calc(var(--card-radius) * 0.5);
+    background: var(--color-surface);
+    object-fit: cover;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Predictive search",
+  "settings": []
+}
+{% endschema %}

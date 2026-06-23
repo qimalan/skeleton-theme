@@ -25,6 +25,7 @@ Renders a product card for grids and featured sections.
   endif
 
   assign show_vendor = show_vendor | default: settings.show_vendor
+  assign card_variant = product_item.selected_or_first_available_variant
 -%}
 
 <article class="card card--product{% if settings.card_style == 'surface' %} card--surface{% endif %}{% if class != blank %} {{ class }}{% endif %}">
@@ -52,6 +53,24 @@ Renders a product card for grids and featured sections.
       </h3>
 
       {% render 'price', product: product_item, show_compare_at_price: true %}
+
+      {%- if settings.quick_add_enabled -%}
+        <div class="card__actions">
+          {%- if product_item.available and product_item.has_only_default_variant -%}
+            {%- form 'product', product_item, class: 'card__form', data-type: 'add-to-cart-form' -%}
+              <input type="hidden" name="id" value="{{ card_variant.id }}">
+              <input type="hidden" name="quantity" value="1">
+              <button class="button button--secondary" type="submit" name="add">
+                {{ 'products.product.quick_add' | t }}
+              </button>
+            {%- endform -%}
+          {%- else -%}
+            <a class="button button--secondary" href="{{ product_item.url }}">
+              {{ 'products.product.choose_options' | t }}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
     </div>
 
     {%- if product_item.available == false -%}

@@ -1,32 +1,90 @@
 {
   "sections": {
     "hero": {
-      "type": "rich-text",
+      "type": "image-banner",
       "settings": {
-        "desktop_content_position": "center",
-        "content_alignment": "center",
-        "full_width": true,
-        "padding_top": 56,
-        "padding_bottom": 56
+        "height": "medium",
+        "content_position": "middle-left",
+        "content_alignment": "left",
+        "overlay_opacity": 35
       },
       "blocks": {
+        "eyebrow": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "Reusable Shopify starter"
+          }
+        },
         "heading": {
           "type": "heading",
           "settings": {
-            "heading": "A reusable starting point",
+            "heading": "Launch cleaner storefronts",
             "heading_size": "h0"
           }
         },
         "text": {
           "type": "text",
           "settings": {
-            "text": "<p>Lightweight, reusable, and aimed at the kind of Shopify work solo freelancers get hired for most often.</p>"
+            "text": "<p>A compact, CSS-first base for common freelance builds, catalog refreshes, and campaign landing pages.</p>"
+          }
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "Shop now",
+            "button_link_1": "",
+            "button_label_2": "Learn more",
+            "button_link_2": ""
           }
         }
       },
       "block_order": [
+        "eyebrow",
         "heading",
-        "text"
+        "text",
+        "buttons"
+      ]
+    },
+    "trust": {
+      "type": "multicolumn",
+      "settings": {
+        "heading": "Built for everyday store work",
+        "text": "<p>Drop in common merchandising, service, and trust content without custom code for every project.</p>",
+        "heading_alignment": "left",
+        "columns_desktop": 3,
+        "columns_mobile": "1",
+        "icon_style": "card"
+      },
+      "blocks": {
+        "fulfillment": {
+          "type": "column",
+          "settings": {
+            "icon": "truck",
+            "heading": "Fast fulfillment",
+            "text": "<p>Use clear shipping and delivery promises across landing pages and product pages.</p>"
+          }
+        },
+        "checkout": {
+          "type": "column",
+          "settings": {
+            "icon": "shield",
+            "heading": "Secure checkout",
+            "text": "<p>Highlight payment confidence, guarantees, and buyer reassurance in a reusable pattern.</p>"
+          }
+        },
+        "support": {
+          "type": "column",
+          "settings": {
+            "icon": "chat",
+            "heading": "Support ready",
+            "text": "<p>Answer common pre-sale questions with FAQ, contact, newsletter, and policy sections.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "fulfillment",
+        "checkout",
+        "support"
       ]
     },
     "featured_collection": {
@@ -50,11 +108,19 @@
         "layout": "section",
         "open_first_collapsible_row": true
       }
+    },
+    "apps": {
+      "type": "apps",
+      "settings": {
+        "include_margins": true
+      }
     }
   },
   "order": [
     "hero",
+    "trust",
     "featured_collection",
-    "faq"
+    "faq",
+    "apps"
   ]
 }

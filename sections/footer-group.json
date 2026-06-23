@@ -11,6 +11,13 @@
   "type": "footer",
   "name": "t:general.footer",
   "sections": {
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Join the list",
+        "text": "<p>Get product updates, offers, and store news.</p>"
+      }
+    },
     "footer": {
       "type": "footer",
       "settings": {
@@ -19,6 +26,7 @@
     }
   },
   "order": [
+    "newsletter",
     "footer"
   ]
 }

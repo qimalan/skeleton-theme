@@ -11,10 +11,62 @@
   "sections": {
     "main": {
       "type": "product",
-      "settings": {}
+      "settings": {
+        "media_limit": 6,
+        "sticky_content": true,
+        "show_vendor": true,
+        "show_sku": true,
+        "show_dynamic_checkout": true,
+        "show_payment_icons": true,
+        "low_inventory_threshold": 5
+      },
+      "blocks": {
+        "secure_checkout": {
+          "type": "icon_with_text",
+          "settings": {
+            "icon": "shield",
+            "text": "<p>Secure checkout and flexible payment options.</p>"
+          }
+        },
+        "shipping_returns": {
+          "type": "accordion",
+          "settings": {
+            "heading": "Shipping and returns",
+            "text": "<p>Add clear fulfillment, delivery, and return details for this product.</p>",
+            "open_by_default": false
+          }
+        },
+        "care_details": {
+          "type": "accordion",
+          "settings": {
+            "heading": "Product details",
+            "text": "<p>Use this block for fit, materials, care instructions, sizing, or other key details.</p>",
+            "open_by_default": false
+          }
+        }
+      },
+      "block_order": [
+        "secure_checkout",
+        "shipping_returns",
+        "care_details"
+      ]
+    },
+    "dynamic_details": {
+      "type": "metafield-content",
+      "settings": {
+        "heading": "Details",
+        "text": "",
+        "heading_alignment": "left",
+        "source": "product",
+        "namespace": "custom",
+        "key": "details",
+        "metaobject_field": "",
+        "show_empty_state": false
+      }
     }
   },
   "order": [
-    "main"
+    "main",
+    "dynamic_details"
   ]
 }

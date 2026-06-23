@@ -24,5 +24,9 @@
     </main>
 
     {% sections 'footer-group' %}
+
+    {%- if settings.cart_drawer_enabled -%}
+      {% section 'cart-drawer' %}
+    {%- endif -%}
   </body>
 </html>

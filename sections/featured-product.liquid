@@ -26,7 +26,7 @@
           <div class="rte">{{ featured_product.description }}</div>
         {%- endif -%}
 
-        {%- form 'product', featured_product, class: 'product-form' -%}
+        {%- form 'product', featured_product, class: 'product-form', data-type: 'add-to-cart-form' -%}
           <input type="hidden" name="id" value="{{ current_variant.id }}">
 
           {% render 'variant-picker', product: featured_product, id_prefix: section.id %}
@@ -36,7 +36,7 @@
             <input class="field__input" type="number" name="quantity" value="1" min="1">
           </label>
 
-          <div class="product-page__purchase">
+          <div class="featured-product-section__purchase">
             <button
               class="button"
               type="submit"
@@ -101,6 +101,11 @@
   .featured-product-section .product-form {
     display: grid;
     gap: 1rem;
+  }
+
+  .featured-product-section__purchase {
+    display: grid;
+    gap: 0.75rem;
   }
 
   .featured-product-section .product-form__quantity {

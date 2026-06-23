@@ -2,21 +2,72 @@
   assign current_variant = product.selected_or_first_available_variant
 -%}
 
-<section class="page-width product-page" data-product-root>
+<section
+  class="page-width product-page{% if section.settings.sticky_content %} product-page--sticky{% endif %}"
+  data-product-root
+  style="--product-media-limit: {{ section.settings.media_limit }};"
+>
   <div class="product-page__grid">
     <div class="product-page__media">
       {%- if product.media != blank -%}
-        <div class="product-page__gallery">
-          {%- for media in product.media limit: 6 -%}
+        <product-media-gallery class="product-page__media-gallery">
+        <div class="product-page__gallery" data-product-gallery>
+          {%- for media in product.media limit: section.settings.media_limit -%}
             {%- liquid
               assign media_loading = 'lazy'
               if forloop.first
                 assign media_loading = 'eager'
               endif
             -%}
-            {% render 'product-media', media: media, loading: media_loading %}
+            <div id="ProductMedia-{{ media.id }}" class="product-page__gallery-item">
+              {%- if section.settings.enable_media_modal -%}
+                <button
+                  class="product-page__media-button"
+                  type="button"
+                  data-media-modal-open
+                  data-media-index="{{ forloop.index0 }}"
+                  aria-label="{{ 'products.product.open_media' | t }}"
+                >
+                  {% render 'product-media', media: media, loading: media_loading %}
+                </button>
+              {%- else -%}
+                {% render 'product-media', media: media, loading: media_loading %}
+              {%- endif -%}
+            </div>
           {%- endfor -%}
         </div>
+
+        {%- if section.settings.show_thumbnails and product.media.size > 1 -%}
+          <nav class="product-page__thumbnails" aria-label="{{ 'products.product.media_gallery' | t }}">
+            {%- for media in product.media limit: section.settings.media_limit -%}
+              <a class="product-page__thumbnail" href="#ProductMedia-{{ media.id }}" aria-label="{{ media.alt | default: product.title | escape }}">
+                {%- if media.preview_image != blank -%}
+                  {{
+                    media.preview_image
+                    | image_url: width: 180, height: 180, crop: 'center'
+                    | image_tag: loading: 'lazy', alt: media.alt
+                  }}
+                {%- endif -%}
+              </a>
+            {%- endfor -%}
+          </nav>
+        {%- endif -%}
+
+        {%- if section.settings.enable_media_modal -%}
+          <dialog class="product-media-modal" data-media-modal>
+            <button class="product-media-modal__close" type="button" data-media-modal-close aria-label="{{ 'cart.close' | t }}">
+              {% render 'icon', icon: 'close' %}
+            </button>
+            <div class="product-media-modal__content">
+              {%- for media in product.media limit: section.settings.media_limit -%}
+                <div class="product-media-modal__item" data-media-slide="{{ forloop.index0 }}">
+                  {% render 'product-media', media: media, loading: 'lazy' %}
+                </div>
+              {%- endfor -%}
+            </div>
+          </dialog>
+        {%- endif -%}
+        </product-media-gallery>
       {%- else -%}
         {{ 'product-apparel-1' | placeholder_svg_tag: 'product-page__placeholder' }}
       {%- endif -%}
@@ -24,19 +75,33 @@
 
     <div class="product-page__content">
       <div class="section-heading">
-        <p class="section-heading__eyebrow">{{ product.vendor }}</p>
+        {%- if section.settings.show_vendor and product.vendor != blank -%}
+          <p class="section-heading__eyebrow">{{ product.vendor }}</p>
+        {%- endif -%}
         <h1>{{ product.title }}</h1>
       </div>
 
-      <div data-variant-price>
+      <div class="product-page__meta">
         {% render 'price', product: product, variant: current_variant, show_compare_at_price: true %}
+
+        {%- if section.settings.show_sku -%}
+          <p
+            class="product__meta{% unless current_variant.sku != blank %} visually-hidden{% endunless %}"
+            data-variant-sku
+            data-sku-label="{{ 'products.product.sku' | t }}"
+          >
+            {%- if current_variant.sku != blank -%}
+              {{ 'products.product.sku' | t }}: {{ current_variant.sku }}
+            {%- endif -%}
+          </p>
+        {%- endif -%}
       </div>
 
       {%- if product.description != blank -%}
         <div class="rte">{{ product.description }}</div>
       {%- endif -%}
 
-      {%- form 'product', product, class: 'product-form' -%}
+      {%- form 'product', product, class: 'product-form', data-type: 'add-to-cart-form' -%}
         <input type="hidden" name="id" value="{{ current_variant.id }}">
 
         {% render 'variant-picker', product: product, id_prefix: section.id %}
@@ -61,14 +126,85 @@
               {{ 'products.product.sold_out' | t }}
             {%- endif -%}
           </button>
+
+          {%- if section.settings.show_dynamic_checkout -%}
+            {{ form | payment_button }}
+          {%- endif -%}
+
           <div
+            class="product-page__status"
             data-variant-status
-            data-available-text=""
+            data-available-text="{{ 'products.product.available' | t }}"
             data-unavailable-text="{{ 'products.product.sold_out' | t }}"
+            data-low-stock-text="{{ 'products.product.low_stock' | t }}"
+            data-sold-out-text="{{ 'products.product.sold_out' | t }}"
+            data-low-inventory-threshold="{{ section.settings.low_inventory_threshold }}"
             aria-live="polite"
           ></div>
+
+          {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
+            <div class="product-page__payments" aria-label="{{ 'products.product.payment_methods' | t }}">
+              {%- for type in shop.enabled_payment_types -%}
+                {{ type | payment_type_svg_tag }}
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
+          {%- if shop.shipping_policy.body != blank or cart.taxes_included or cart.duties_included -%}
+            <div class="product-page__note rte">
+              {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+              {%- else -%}
+                {{ 'products.product.checkout_note' | t }}
+              {%- endif -%}
+            </div>
+          {%- endif -%}
         </div>
       {%- endform -%}
+
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'text' -%}
+            {%- if block.settings.heading != blank or block.settings.text != blank -%}
+              <div class="product-page__info" {{ block.shopify_attributes }}>
+                {%- if block.settings.heading != blank -%}
+                  <h2 class="h4">{{ block.settings.heading }}</h2>
+                {%- endif -%}
+                {%- if block.settings.text != blank -%}
+                  <div class="rte">{{ block.settings.text }}</div>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          {%- when 'page' -%}
+            {%- if block.settings.page != blank -%}
+              <div class="product-page__info" {{ block.shopify_attributes }}>
+                {%- if block.settings.heading != blank -%}
+                  <h2 class="h4">{{ block.settings.heading }}</h2>
+                {%- endif -%}
+                <div class="rte">{{ block.settings.page.content }}</div>
+              </div>
+            {%- endif -%}
+          {%- when 'accordion' -%}
+            {%- if block.settings.heading != blank or block.settings.text != blank -%}
+              <details class="product-page__accordion" {{ block.shopify_attributes }} {% if block.settings.open_by_default %}open{% endif %}>
+                <summary>
+                  <span>{{ block.settings.heading }}</span>
+                  {% render 'icon', icon: 'chevron-down' %}
+                </summary>
+                <div class="rte">{{ block.settings.text }}</div>
+              </details>
+            {%- endif -%}
+          {%- when 'icon_with_text' -%}
+            {%- if block.settings.text != blank -%}
+              <div class="product-page__callout" {{ block.shopify_attributes }}>
+                {%- if block.settings.icon != 'none' -%}
+                  {% render 'icon', icon: block.settings.icon %}
+                {%- endif -%}
+                <div class="rte">{{ block.settings.text }}</div>
+              </div>
+            {%- endif -%}
+        {%- endcase -%}
+      {%- endfor -%}
 
       {%- if product.metafields.custom.specs != blank -%}
         <div class="rte">{{ product.metafields.custom.specs | metafield_tag }}</div>
@@ -88,6 +224,88 @@
   .product-page__gallery {
     display: grid;
     gap: 1rem;
+  }
+
+  .product-page__media-gallery {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .product-page__gallery-item {
+    scroll-margin-top: 5rem;
+  }
+
+  .product-page__media-button {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: zoom-in;
+  }
+
+  .product-page__thumbnails {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .product-page__thumbnail {
+    flex: 0 0 4.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: calc(var(--card-radius) * 0.5);
+    overflow: hidden;
+  }
+
+  .product-page__thumbnail img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  .product-media-modal {
+    width: min(72rem, calc(100% - 2rem));
+    max-height: calc(100svh - 2rem);
+    padding: 1rem;
+    border: 0;
+    border-radius: var(--card-radius);
+    background: var(--color-background);
+  }
+
+  .product-media-modal::backdrop {
+    background: rgba(17, 17, 17, 0.55);
+  }
+
+  .product-media-modal__close {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-inline-start: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--button-radius);
+    background: var(--color-background);
+  }
+
+  .product-media-modal__content {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .product-media-modal__item {
+    scroll-margin-top: 2rem;
+  }
+
+  .product-page--sticky .product-page__content {
+    position: sticky;
+    top: 1rem;
+    align-self: start;
   }
 
   .product-media,
@@ -117,6 +335,54 @@
     gap: 0.75rem;
   }
 
+  .product-page__status {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+
+  .product-page__payments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .product-page__payments svg {
+    width: 2.5rem;
+    height: 1.6rem;
+  }
+
+  .product-page__note {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+
+  .product-page__info,
+  .product-page__accordion,
+  .product-page__callout {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .product-page__accordion summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-weight: 600;
+  }
+
+  .product-page__callout {
+    grid-template-columns: auto 1fr;
+    align-items: start;
+  }
+
+  .product-page__callout .icon {
+    margin-top: 0.1rem;
+  }
+
   .product-form__quantity {
     max-width: 8rem;
   }
@@ -125,12 +391,177 @@
     .product-page__grid {
       grid-template-columns: 1fr;
     }
+
+    .product-page--sticky .product-page__content {
+      position: static;
+    }
+
+    .product-page__gallery {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(82%, 1fr);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: thin;
+    }
+
+    .product-page__gallery-item {
+      scroll-snap-align: start;
+    }
   }
 {% endstylesheet %}
 
 {% schema %}
 {
   "name": "Product",
-  "settings": []
+  "settings": [
+    {
+      "type": "range",
+      "id": "media_limit",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 6,
+      "label": "Media limit"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_thumbnails",
+      "default": true,
+      "label": "Show thumbnails"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_media_modal",
+      "default": true,
+      "label": "Enable media modal"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_content",
+      "default": true,
+      "label": "Sticky content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "default": true,
+      "label": "Show vendor"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sku",
+      "default": true,
+      "label": "Show SKU"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "default": true,
+      "label": "Show dynamic checkout"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "default": true,
+      "label": "Show payment icons"
+    },
+    {
+      "type": "range",
+      "id": "low_inventory_threshold",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 5,
+      "label": "Low inventory threshold"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "Highlights",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>Use this block for service notes, feature summaries, or short sales copy.</p>",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "page",
+      "name": "Page",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "More details",
+          "label": "Heading"
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Page"
+        }
+      ]
+    },
+    {
+      "type": "accordion",
+      "name": "Accordion",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "Shipping and returns",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>Use this block for returns, shipping, or service policy details.</p>",
+          "label": "Text"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_by_default",
+          "default": false,
+          "label": "Open by default"
+        }
+      ]
+    },
+    {
+      "type": "icon_with_text",
+      "name": "Icon with text",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "truck", "label": "Truck" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "return", "label": "Return" },
+            { "value": "chat", "label": "Chat" },
+            { "value": "gift", "label": "Gift" }
+          ],
+          "default": "shield",
+          "label": "Icon"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>Use this for a compact trust note or service promise.</p>",
+          "label": "Text"
+        }
+      ]
+    }
+  ]
 }
 {% endschema %}

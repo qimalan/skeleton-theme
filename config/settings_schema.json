@@ -120,6 +120,8 @@
     "settings": [
       { "type": "checkbox", "id": "sticky_header", "label": "Sticky header", "default": true },
       { "type": "checkbox", "id": "show_search", "label": "Show search", "default": true },
+      { "type": "checkbox", "id": "predictive_search_enabled", "label": "Enable predictive search", "default": true },
+      { "type": "checkbox", "id": "show_localization", "label": "Show localization selectors", "default": false },
       { "type": "checkbox", "id": "show_account", "label": "Show account", "default": true },
       { "type": "checkbox", "id": "show_cart_count", "label": "Show cart count", "default": true }
     ]
@@ -149,13 +151,21 @@
         "default": "square"
       },
       { "type": "checkbox", "id": "show_vendor", "label": "Show vendor", "default": false },
-      { "type": "checkbox", "id": "show_secondary_image", "label": "Show secondary image", "default": false }
+      { "type": "checkbox", "id": "show_secondary_image", "label": "Show secondary image", "default": false },
+      { "type": "checkbox", "id": "quick_add_enabled", "label": "Enable quick add", "default": true }
+    ]
+  },
+  {
+    "name": "Cart",
+    "settings": [
+      { "type": "checkbox", "id": "cart_drawer_enabled", "label": "Enable cart drawer", "default": true }
     ]
   },
   {
     "name": "Footer",
     "settings": [
       { "type": "checkbox", "id": "show_payment_icons", "label": "Show payment icons", "default": true },
+      { "type": "checkbox", "id": "show_footer_localization", "label": "Show localization selectors", "default": true },
       { "type": "checkbox", "id": "currency_code_enabled", "label": "Show currency code", "default": false },
       {
         "type": "text",

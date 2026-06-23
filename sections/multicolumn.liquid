@@ -1,0 +1,269 @@
+<section
+  class="page-width multicolumn-section multicolumn-section--{{ section.settings.icon_style }}"
+  style="
+    --multicolumn-columns-desktop: {{ section.settings.columns_desktop }};
+    --multicolumn-columns-mobile: {{ section.settings.columns_mobile }};
+  "
+>
+  {%- if section.settings.heading != blank or section.settings.text != blank -%}
+    <div class="section-heading section-heading--{{ section.settings.heading_alignment }}">
+      {%- if section.settings.heading != blank -%}
+        <h2>{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="section-heading__text rte">{{ section.settings.text }}</div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="multicolumn-section__grid">
+    {%- for block in section.blocks -%}
+      <div class="multicolumn-section__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <div class="multicolumn-section__media">
+            {% render 'image', image: block.settings.image, width: 800, height: 800, crop: 'center' %}
+          </div>
+        {%- elsif block.settings.icon != 'none' -%}
+          <div class="multicolumn-section__icon">
+            {% render 'icon', icon: block.settings.icon %}
+          </div>
+        {%- endif -%}
+
+        <div class="multicolumn-section__content">
+          {%- if block.settings.heading != blank -%}
+            <h3>{{ block.settings.heading }}</h3>
+          {%- endif -%}
+
+          {%- if block.settings.text != blank -%}
+            <div class="rte">{{ block.settings.text }}</div>
+          {%- endif -%}
+
+          {%- if block.settings.link_label != blank -%}
+            <a
+              class="link"
+              {% if block.settings.link == blank %}
+                role="link" aria-disabled="true"
+              {% else %}
+                href="{{ block.settings.link }}"
+              {% endif %}
+            >
+              {{ block.settings.link_label | escape }}
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .section-heading--center {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .section-heading--right {
+    justify-items: end;
+    text-align: right;
+  }
+
+  .multicolumn-section__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--multicolumn-columns-mobile), minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .multicolumn-section__item {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+    padding: 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--card-radius);
+    background: var(--color-background);
+  }
+
+  .multicolumn-section--plain .multicolumn-section__item {
+    padding: 0;
+    border: 0;
+  }
+
+  .multicolumn-section__media {
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: calc(var(--card-radius) * 0.75);
+    background: var(--color-surface);
+  }
+
+  .multicolumn-section__media .image,
+  .multicolumn-section__media .image__element {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .multicolumn-section__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-accent);
+  }
+
+  .multicolumn-section__content {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .multicolumn-section__content .rte {
+    color: var(--color-muted);
+  }
+
+  @media (min-width: 750px) {
+    .multicolumn-section__grid {
+      grid-template-columns: repeat(var(--multicolumn-columns-desktop), minmax(0, 1fr));
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Multicolumn",
+  "tag": "section",
+  "class": "section-multicolumn",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "default": "Why shop with us",
+      "label": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left",
+      "label": "Heading alignment"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3,
+      "label": "Desktop columns"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "options": [
+        { "value": "1", "label": "1 column" },
+        { "value": "2", "label": "2 columns" }
+      ],
+      "default": "1",
+      "label": "Mobile columns"
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "options": [
+        { "value": "card", "label": "Card" },
+        { "value": "plain", "label": "Plain" }
+      ],
+      "default": "card",
+      "label": "Style"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Column",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "truck", "label": "Truck" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "return", "label": "Return" },
+            { "value": "chat", "label": "Chat" },
+            { "value": "gift", "label": "Gift" },
+            { "value": "star", "label": "Star" }
+          ],
+          "default": "truck",
+          "label": "Icon"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "default": "Fast fulfillment",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>Use this block for shipping promises, guarantees, service notes, or store differentiators.</p>",
+          "label": "Text"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Multicolumn",
+      "blocks": [
+        {
+          "type": "column",
+          "settings": {
+            "icon": "truck",
+            "heading": "Fast fulfillment"
+          }
+        },
+        {
+          "type": "column",
+          "settings": {
+            "icon": "shield",
+            "heading": "Secure checkout"
+          }
+        },
+        {
+          "type": "column",
+          "settings": {
+            "icon": "return",
+            "heading": "Easy returns"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
