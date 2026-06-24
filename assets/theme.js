@@ -198,6 +198,15 @@ class CartDrawer extends HTMLElement {
     this.sectionId = this.dataset.sectionId || 'cart-drawer';
     this.changeTimeout = null;
     this.previousFocus = null;
+    this.focusableSelectors = [
+      'a[href]:not([tabindex="-1"])',
+      'button:not([disabled]):not([tabindex="-1"])',
+      'input:not([type="hidden"]):not([disabled]):not([tabindex="-1"])',
+      'select:not([disabled]):not([tabindex="-1"])',
+      'textarea:not([disabled]):not([tabindex="-1"])',
+      '[tabindex]:not([tabindex="-1"])',
+      '[contenteditable="true"]',
+    ].join(', ');
 
     this.boundClick = (event) => this.handleDocumentClick(event);
     this.boundSubmit = (event) => this.handleDocumentSubmit(event);
@@ -267,10 +276,51 @@ class CartDrawer extends HTMLElement {
   handleKeydown(event) {
     if (!this.classList.contains('is-open')) return;
 
+    if (event.key === 'Tab') {
+      this.trapFocus(event);
+      return;
+    }
+
     if (event.key === 'Escape') {
       event.preventDefault();
       this.close();
     }
+  }
+
+  trapFocus(event) {
+    if (!this.panel) return;
+
+    const focusableElements = this.getFocusableElements();
+    if (focusableElements.length === 0) {
+      event.preventDefault();
+      this.panel.focus();
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    const activeElement = document.activeElement;
+
+    if (event.shiftKey) {
+      if (!this.contains(activeElement) || activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      }
+      return;
+    }
+
+    if (!this.contains(activeElement) || activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  }
+
+  getFocusableElements() {
+    if (!this.panel) return [];
+
+    return Array.from(this.panel.querySelectorAll(this.focusableSelectors)).filter(
+      (element) => element.getClientRects().length > 0
+    );
   }
 
   async addItem(form) {
@@ -390,11 +440,7 @@ class ProductMediaGallery extends HTMLElement {
   openModal(index) {
     if (!this.dialog) return;
 
-    if (typeof this.dialog.showModal === 'function') {
-      this.dialog.showModal();
-    } else {
-      this.dialog.setAttribute('open', '');
-    }
+    if (!this.dialog.open) this.dialog.showModal();
 
     const item = this.dialog.querySelector(`[data-media-slide="${index}"]`);
     if (item) {
@@ -405,11 +451,7 @@ class ProductMediaGallery extends HTMLElement {
   closeModal() {
     if (!this.dialog) return;
 
-    if (typeof this.dialog.close === 'function') {
-      this.dialog.close();
-    } else {
-      this.dialog.removeAttribute('open');
-    }
+    this.dialog.close();
   }
 }
 
