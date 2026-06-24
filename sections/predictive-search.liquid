@@ -39,6 +39,10 @@
           </li>
         {%- endfor -%}
 
+        {%- for query in predictive_search.resources.queries limit: 3 -%}
+          <li><a class="predictive-search__text-link" href="{{ query.url }}" data-predictive-search-item>{{ query.styled_text }}</a></li>
+        {%- endfor -%}
+
         {%- for collection in predictive_search.resources.collections limit: 3 -%}
           <li><a class="predictive-search__text-link" href="{{ collection.url }}" data-predictive-search-item>{{ collection.title | escape }}</a></li>
         {%- endfor -%}

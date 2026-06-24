@@ -1,6 +1,19 @@
 {%- liquid
   assign featured_product = section.settings.product
   assign current_variant = featured_product.selected_or_first_available_variant
+  assign low_inventory_threshold = section.settings.low_inventory_threshold | default: 5
+  assign current_inventory_quantity = current_variant.inventory_quantity | default: 0
+  assign initial_inventory_text = ''
+
+  if current_variant != blank
+    assign initial_inventory_text = 'products.product.available' | t
+
+    if current_variant.available == false
+      assign initial_inventory_text = 'products.product.sold_out' | t
+    elsif current_variant.inventory_management == 'shopify' and current_variant.inventory_policy != 'continue' and current_inventory_quantity > 0 and low_inventory_threshold > 0 and current_inventory_quantity <= low_inventory_threshold
+      assign initial_inventory_text = 'products.product.low_stock' | t | replace: '[count]', current_inventory_quantity
+    endif
+  endif
 -%}
 
 <section class="page-width featured-product-section" data-product-root>
@@ -53,10 +66,14 @@
             </button>
             <div
               data-variant-status
-              data-available-text=""
+              data-available-text="{{ 'products.product.available' | t }}"
               data-unavailable-text="{{ 'products.product.sold_out' | t }}"
+              data-low-stock-text="{{ 'products.product.low_stock' | t }}"
+              data-low-inventory-threshold="{{ low_inventory_threshold }}"
               aria-live="polite"
-            ></div>
+            >
+              {{- initial_inventory_text -}}
+            </div>
           </div>
         {%- endform -%}
       </div>
@@ -108,6 +125,11 @@
     gap: 0.75rem;
   }
 
+  .featured-product-section [data-variant-status] {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+
   .featured-product-section .product-form__quantity {
     max-width: 8rem;
   }
@@ -143,6 +165,15 @@
       ],
       "default": "image_first",
       "label": "Media position"
+    },
+    {
+      "type": "range",
+      "id": "low_inventory_threshold",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 5,
+      "label": "Low inventory threshold"
     }
   ],
   "presets": [

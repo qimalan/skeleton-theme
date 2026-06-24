@@ -309,6 +309,12 @@ class CartDrawer extends HTMLElement {
 
   async refreshFromSection(openAfterRefresh = false) {
     const activeElement = document.activeElement;
+    const focusOrigin =
+      this.previousFocus && document.contains(this.previousFocus)
+        ? this.previousFocus
+        : activeElement && document.contains(activeElement) && !this.contains(activeElement)
+          ? activeElement
+          : document.querySelector('[data-cart-open]') || document.body;
     const response = await fetch(`${this.cartUrl}?section_id=${encodeURIComponent(this.sectionId)}`, {
       headers: { Accept: 'text/html' },
     });
@@ -321,14 +327,23 @@ class CartDrawer extends HTMLElement {
 
     if (!nextDrawer) return null;
 
+    this.updateCartCount(nextDrawer.dataset.cartItemCount);
     this.outerHTML = nextDrawer.outerHTML;
     const replacement = document.querySelector('[data-cart-drawer]');
 
     if (replacement && openAfterRefresh) {
-      replacement.open(activeElement);
+      replacement.open(focusOrigin);
     }
 
     return replacement;
+  }
+
+  updateCartCount(count) {
+    const itemCount = Number(count || 0);
+    document.querySelectorAll('[data-cart-count]').forEach((element) => {
+      element.textContent = itemCount;
+      element.hidden = itemCount === 0;
+    });
   }
 
   open(focusOrigin = document.activeElement) {
@@ -368,7 +383,7 @@ class ProductMediaGallery extends HTMLElement {
 
     if (closeButton) {
       event.preventDefault();
-      this.dialog?.close();
+      this.closeModal();
     }
   }
 
@@ -384,6 +399,16 @@ class ProductMediaGallery extends HTMLElement {
     const item = this.dialog.querySelector(`[data-media-slide="${index}"]`);
     if (item) {
       window.setTimeout(() => item.scrollIntoView({ block: 'start' }), 0);
+    }
+  }
+
+  closeModal() {
+    if (!this.dialog) return;
+
+    if (typeof this.dialog.close === 'function') {
+      this.dialog.close();
+    } else {
+      this.dialog.removeAttribute('open');
     }
   }
 }

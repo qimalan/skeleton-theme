@@ -1,5 +1,14 @@
 {%- liquid
   assign current_variant = product.selected_or_first_available_variant
+  assign current_inventory_quantity = current_variant.inventory_quantity | default: 0
+  assign low_inventory_threshold = section.settings.low_inventory_threshold
+  assign initial_inventory_text = 'products.product.available' | t
+
+  if current_variant.available == false
+    assign initial_inventory_text = 'products.product.sold_out' | t
+  elsif current_variant.inventory_management == 'shopify' and current_variant.inventory_policy != 'continue' and current_inventory_quantity > 0 and low_inventory_threshold > 0 and current_inventory_quantity <= low_inventory_threshold
+    assign initial_inventory_text = 'products.product.low_stock' | t | replace: '[count]', current_inventory_quantity
+  endif
 -%}
 
 <section
@@ -140,7 +149,9 @@
             data-sold-out-text="{{ 'products.product.sold_out' | t }}"
             data-low-inventory-threshold="{{ section.settings.low_inventory_threshold }}"
             aria-live="polite"
-          ></div>
+          >
+            {{- initial_inventory_text -}}
+          </div>
 
           {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
             <div class="product-page__payments" aria-label="{{ 'products.product.payment_methods' | t }}">
