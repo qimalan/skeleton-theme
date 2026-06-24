@@ -18,10 +18,10 @@
                   {% render 'image', image: item.image, url: item.url, width: 400, height: 400, crop: 'center' %}
                 {%- endif -%}
                 <div>
-                  <h3 class="card__title"><a href="{{ item.url }}">{{ item.product.title }}</a></h3>
+                  <h3 class="card__title"><a href="{{ item.url }}">{{ item.product.title | escape }}</a></h3>
                   <p class="card__text">{{ item.final_line_price | money }}</p>
                   {%- unless item.product.has_only_default_variant -%}
-                    <p class="card__text">{{ item.variant.title }}</p>
+                    <p class="card__text">{{ item.variant.title | escape }}</p>
                   {%- endunless -%}
                 </div>
               </div>

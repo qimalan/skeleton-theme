@@ -15,7 +15,7 @@ Renders country and language selectors.
         <select class="field__input" id="{{ form_id }}Country" name="country_code">
           {%- for country in localization.available_countries -%}
             <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>
-              {{ country.name }} ({{ country.currency.iso_code }})
+              {{ country.name | escape }} ({{ country.currency.iso_code | escape }})
             </option>
           {%- endfor -%}
         </select>
@@ -28,7 +28,7 @@ Renders country and language selectors.
         <select class="field__input" id="{{ form_id }}Language" name="locale_code">
           {%- for language in localization.available_languages -%}
             <option value="{{ language.iso_code }}" {% if language.iso_code == localization.language.iso_code %}selected{% endif %}>
-              {{ language.endonym_name | capitalize }}
+              {{ language.endonym_name | capitalize | escape }}
             </option>
           {%- endfor -%}
         </select>

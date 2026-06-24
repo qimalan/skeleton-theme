@@ -5,7 +5,7 @@ Renders a product media item with image, video, external video, and model suppor
 {% enddoc %}
 
 {%- if media != blank -%}
-  <div class="product-media product-media--{{ media.media_type }}" data-media-id="{{ media.id }}">
+  <div class="product-media product-media--{{ media.media_type }}">
     {%- case media.media_type -%}
       {%- when 'image' -%}
         {% render 'image', image: media, width: 1600, height: 1600, crop: 'center', loading: loading %}

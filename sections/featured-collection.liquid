@@ -5,8 +5,8 @@
 
 <section class="page-width featured-collection">
   <div class="section-heading">
-    <p class="section-heading__eyebrow">{{ section.settings.eyebrow }}</p>
-    <h2>{{ section.settings.title }}</h2>
+    <p class="section-heading__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    <h2>{{ section.settings.title | escape }}</h2>
     {%- if section.settings.description != blank -%}
       <div class="section-heading__text rte">{{ section.settings.description }}</div>
     {%- elsif collection_item != blank and collection_item.description != blank -%}
@@ -31,7 +31,7 @@
 
   {%- if section.settings.show_view_all and collection_item != blank -%}
     <div class="featured-collection__footer">
-      <a class="button button--secondary" href="{{ collection_item.url }}">{{ section.settings.view_all_label }}</a>
+      <a class="button button--secondary" href="{{ collection_item.url }}">{{ section.settings.view_all_label | escape }}</a>
     </div>
   {%- endif -%}
 </section>

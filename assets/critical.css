@@ -255,6 +255,21 @@ h6 + * {
   color: var(--color-muted);
 }
 
+.section-heading--left {
+  justify-items: start;
+  text-align: left;
+}
+
+.section-heading--center {
+  justify-items: center;
+  text-align: center;
+}
+
+.section-heading--right {
+  justify-items: end;
+  text-align: right;
+}
+
 .rte {
   display: grid;
   gap: 1rem;

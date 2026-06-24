@@ -103,6 +103,7 @@
     "title": "Featured product"
   },
   "contact": {
+    "title": "Contact",
     "email": "Email",
     "message": "Message",
     "name": "Name",

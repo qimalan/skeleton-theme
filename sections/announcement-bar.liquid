@@ -10,7 +10,7 @@
       {%- for block in section.blocks -%}
         {%- if block.settings.text != blank -%}
           {%- if block.settings.link != blank -%}
-            <a class="announcement-bar__item" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>
+            <a class="announcement-bar__item" href="{{ block.settings.link | escape }}" {{ block.shopify_attributes }}>
           {%- else -%}
             <p class="announcement-bar__item" {{ block.shopify_attributes }}>
           {%- endif -%}

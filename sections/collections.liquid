@@ -7,11 +7,15 @@
     {%- endif -%}
   </div>
 
-  <div class="collection-grid">
-    {%- for collection in collections -%}
-      {% render 'card-collection', card_collection: collection %}
-    {%- endfor -%}
-  </div>
+  {%- paginate collections by 48 -%}
+    <div class="collection-grid">
+      {%- for collection in collections -%}
+        {% render 'card-collection', card_collection: collection %}
+      {%- endfor -%}
+    </div>
+
+    {% render 'pagination', paginate: paginate %}
+  {%- endpaginate -%}
 </section>
 
 {% schema %}
@@ -22,7 +26,7 @@
       "type": "richtext",
       "id": "description",
       "label": "Description",
-      "default": "<p>Browse the store’s collections.</p>"
+      "default": "<p>Browse the store's collections.</p>"
     }
   ]
 }

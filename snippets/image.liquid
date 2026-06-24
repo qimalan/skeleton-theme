@@ -21,7 +21,7 @@ Renders a responsive image, optionally wrapped in a link.
 -%}
 
 {% if image != blank %}
-  <{{ wrapper }} class="image {{ class }}" {% if url != blank %}href="{{ url }}"{% endif %}>
+  <{{ wrapper }} class="image{% if class != blank %} {{ class | escape }}{% endif %}" {% if url != blank %}href="{{ url | escape }}"{% endif %}>
     {{ image
       | image_url: width: output_width, height: output_height, crop: crop
       | image_tag: class: 'image__element', loading: loading_strategy, alt: image.alt

@@ -5,7 +5,7 @@ Renders a compact list of social links using the theme settings.
 <ul class="social-icons" role="list">
   {%- if settings.social_twitter_link != blank -%}
     <li>
-      <a href="{{ settings.social_twitter_link }}" target="_blank" rel="noopener">
+      <a href="{{ settings.social_twitter_link | escape }}" target="_blank" rel="noopener">
         {% render 'icon', icon: 'arrow-right' %}
         <span class="visually-hidden">{{ 'social.twitter' | t }}</span>
       </a>
@@ -13,7 +13,7 @@ Renders a compact list of social links using the theme settings.
   {%- endif -%}
   {%- if settings.social_facebook_link != blank -%}
     <li>
-      <a href="{{ settings.social_facebook_link }}" target="_blank" rel="noopener">
+      <a href="{{ settings.social_facebook_link | escape }}" target="_blank" rel="noopener">
         {% render 'icon', icon: 'arrow-right' %}
         <span class="visually-hidden">{{ 'social.facebook' | t }}</span>
       </a>
@@ -21,7 +21,7 @@ Renders a compact list of social links using the theme settings.
   {%- endif -%}
   {%- if settings.social_instagram_link != blank -%}
     <li>
-      <a href="{{ settings.social_instagram_link }}" target="_blank" rel="noopener">
+      <a href="{{ settings.social_instagram_link | escape }}" target="_blank" rel="noopener">
         {% render 'icon', icon: 'arrow-right' %}
         <span class="visually-hidden">{{ 'social.instagram' | t }}</span>
       </a>

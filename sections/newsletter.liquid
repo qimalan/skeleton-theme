@@ -1,7 +1,7 @@
 <section class="page-width newsletter-section">
   <div class="section-heading">
     <p class="section-heading__eyebrow">{{ 'newsletter.eyebrow' | t }}</p>
-    <h2>{{ section.settings.heading }}</h2>
+    <h2>{{ section.settings.heading | escape }}</h2>
     {%- if section.settings.text != blank -%}
       <div class="section-heading__text rte">{{ section.settings.text }}</div>
     {%- endif -%}
@@ -22,7 +22,7 @@
         type="email"
         name="contact[email]"
         autocomplete="email"
-        value="{{ form.email }}"
+        value="{{ form.email | escape }}"
         placeholder="{{ 'newsletter.email' | t }}"
         required
       >

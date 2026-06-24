@@ -12,19 +12,19 @@ Renders the theme contact form.
   <div class="contact-section__grid">
     <label class="field">
       <span>{{ 'contact.name' | t }}</span>
-      <input class="field__input" type="text" name="contact[name]" autocomplete="name" value="{% if form.name %}{{ form.name }}{% endif %}">
+      <input class="field__input" type="text" name="contact[name]" autocomplete="name" value="{{ form.name | escape }}">
     </label>
     <label class="field">
       <span>{{ 'contact.email' | t }}</span>
-      <input class="field__input" type="email" name="contact[email]" autocomplete="email" value="{% if form.email %}{{ form.email }}{% endif %}" required>
+      <input class="field__input" type="email" name="contact[email]" autocomplete="email" value="{{ form.email | escape }}" required>
     </label>
     <label class="field">
       <span>{{ 'contact.phone' | t }}</span>
-      <input class="field__input" type="tel" name="contact[phone]" autocomplete="tel" value="{% if form.phone %}{{ form.phone }}{% endif %}">
+      <input class="field__input" type="tel" name="contact[phone]" autocomplete="tel" value="{{ form.phone | escape }}">
     </label>
     <label class="field contact-section__full">
       <span>{{ 'contact.message' | t }}</span>
-      <textarea class="field__input" name="contact[body]" rows="8" required>{% if form.body %}{{ form.body }}{% endif %}</textarea>
+      <textarea class="field__input" name="contact[body]" rows="8" required>{{ form.body | escape }}</textarea>
     </label>
   </div>
 

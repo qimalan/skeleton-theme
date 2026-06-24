@@ -12,7 +12,7 @@
 
     {%- if result_count > 0 -%}
       <p class="predictive-search__heading">{{ 'search.results' | t }}</p>
-      <ul class="predictive-search__list" role="list" data-predictive-search-list>
+      <ul class="predictive-search__list" role="list">
         {%- for product in predictive_search.resources.products limit: 4 -%}
           {%- liquid
             assign money_price = product.price | money

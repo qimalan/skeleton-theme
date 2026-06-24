@@ -18,17 +18,16 @@ Outputs canonical, Open Graph, and Twitter metadata.
 -%}
 
 <meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="{{ settings.color_background }}">
+<meta name="theme-color" content="{{ settings.color_background | escape }}">
 {% comment %}theme-check-disable RemoteAsset{% endcomment %}
-<link rel="canonical" href="{{ og_url }}">
+<link rel="canonical" href="{{ og_url | escape }}">
 {% comment %}theme-check-enable RemoteAsset{% endcomment %}
 <title>
-  {{ page_title }}
-  {%- if current_tags %} - tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+  {{ page_title | escape }}
+  {%- if current_tags %} - tagged "{{ current_tags | join: ', ' | escape }}"{% endif -%}
   {%- if current_page != 1 %} - Page {{ current_page }}{% endif -%}
-  {%- unless page_title contains shop.name %} - {{ shop.name }}{% endunless -%}
+  {%- unless page_title contains shop.name %} - {{ shop.name | escape }}{% endunless -%}
 </title>
 
 {%- if page_description -%}
@@ -39,10 +38,10 @@ Outputs canonical, Open Graph, and Twitter metadata.
   <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
 {%- endif -%}
 
-<meta property="og:site_name" content="{{ shop.name }}">
-<meta property="og:url" content="{{ og_url }}">
+<meta property="og:site_name" content="{{ shop.name | escape }}">
+<meta property="og:url" content="{{ og_url | escape }}">
 <meta property="og:title" content="{{ og_title | escape }}">
-<meta property="og:type" content="{{ og_type }}">
+<meta property="og:type" content="{{ og_type | escape }}">
 <meta property="og:description" content="{{ og_description | escape }}">
 
 {%- if page_image -%}
@@ -56,7 +55,7 @@ Outputs canonical, Open Graph, and Twitter metadata.
     {{ product | structured_data }}
   </script>
   <meta property="og:price:amount" content="{{ product.price | money_without_currency | strip_html }}">
-  <meta property="og:price:currency" content="{{ cart.currency.iso_code }}">
+  <meta property="og:price:currency" content="{{ cart.currency.iso_code | escape }}">
 {%- endif -%}
 
 <meta name="twitter:card" content="summary_large_image">

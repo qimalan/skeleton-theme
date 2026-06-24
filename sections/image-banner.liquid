@@ -59,7 +59,7 @@
                   {% if block.settings.button_link_1 == blank %}
                     role="link" aria-disabled="true"
                   {% else %}
-                    href="{{ block.settings.button_link_1 }}"
+                    href="{{ block.settings.button_link_1 | escape }}"
                   {% endif %}
                   class="button"
                 >
@@ -72,7 +72,7 @@
                   {% if block.settings.button_link_2 == blank %}
                     role="link" aria-disabled="true"
                   {% else %}
-                    href="{{ block.settings.button_link_2 }}"
+                    href="{{ block.settings.button_link_2 | escape }}"
                   {% endif %}
                   class="button button--secondary"
                 >

@@ -31,8 +31,7 @@ Renders a product or variant price.
 
 {%- if target != blank -%}
   <div
-    class="price {{ class }}{% if compare_at_price > price %} price--sale{% endif %}{% unless target.available %} price--sold-out{% endunless %}"
-    data-price
+    class="price{% if class != blank %} {{ class | escape }}{% endif %}"
   >
     <span class="price__current" data-price-current>
       {%- if product != blank and product.price_varies and variant == blank -%}

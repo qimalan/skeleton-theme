@@ -4,7 +4,7 @@
       {%- if settings.logo != blank -%}
         {{ settings.logo | image_url: width: settings.logo_width | image_tag: class: 'site-header__logo', alt: shop.name }}
       {%- else -%}
-        <span class="site-header__title">{{ shop.name }}</span>
+        <span class="site-header__title">{{ shop.name | escape }}</span>
       {%- endif -%}
     </a>
 
@@ -83,8 +83,6 @@
               <predictive-search
                 class="predictive-search"
                 data-url="{{ routes.predictive_search_url }}"
-                data-results-text="{{ 'search.results' | t }}"
-                data-no-results-text="{{ 'search.no_results_plain' | t }}"
               >
             {%- endif -%}
               <form action="{{ routes.search_url }}" method="get" role="search" class="predictive-search__form">

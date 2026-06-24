@@ -10,12 +10,9 @@ Renders the min and max inputs for a price range filter.
       class="field__input"
       type="text"
       inputmode="decimal"
-      name="{{ filter.min_value.param_name }}"
-      value="{% if filter.min_value.value %}{{ filter.min_value.value | money_without_currency }}{% endif %}"
+      name="{{ filter.min_value.param_name | escape }}"
+      value="{% if filter.min_value.value %}{{ filter.min_value.value | money_without_currency | escape }}{% endif %}"
       placeholder="0"
-      data-pattern="\d| |,|\."
-      data-min="0"
-      data-max="{{ filter.range_max | money_without_currency }}"
     >
   </label>
 
@@ -25,12 +22,9 @@ Renders the min and max inputs for a price range filter.
       class="field__input"
       type="text"
       inputmode="decimal"
-      name="{{ filter.max_value.param_name }}"
-      value="{% if filter.max_value.value %}{{ filter.max_value.value | money_without_currency }}{% endif %}"
-      placeholder="{{ filter.range_max | money_without_currency }}"
-      data-pattern="\d| |,|\."
-      data-min="0"
-      data-max="{{ filter.range_max | money_without_currency }}"
+      name="{{ filter.max_value.param_name | escape }}"
+      value="{% if filter.max_value.value %}{{ filter.max_value.value | money_without_currency | escape }}{% endif %}"
+      placeholder="{{ filter.range_max | money_without_currency | escape }}"
     >
   </label>
 </div>

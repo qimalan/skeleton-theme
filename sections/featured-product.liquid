@@ -27,13 +27,11 @@
 
       <div class="featured-product-section__content">
         <div class="section-heading">
-          <p class="section-heading__eyebrow">{{ featured_product.vendor }}</p>
-          <h2>{{ featured_product.title }}</h2>
+          <p class="section-heading__eyebrow">{{ featured_product.vendor | escape }}</p>
+          <h2>{{ featured_product.title | escape }}</h2>
         </div>
 
-        <div data-variant-price>
-          {% render 'price', product: featured_product, variant: current_variant, show_compare_at_price: true %}
-        </div>
+        {% render 'price', product: featured_product, variant: current_variant, show_compare_at_price: true %}
 
         {%- if featured_product.description != blank -%}
           <div class="rte">{{ featured_product.description }}</div>

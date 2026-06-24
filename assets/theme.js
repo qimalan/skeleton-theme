@@ -6,9 +6,8 @@ class VariantSelects extends HTMLElement {
     this.hiddenInput = this.form ? this.form.querySelector('[name="id"]') : null;
     this.submitButton = this.form ? this.form.querySelector('[type="submit"][name="add"]') : null;
     this.status = this.root ? this.root.querySelector('[data-variant-status]') : null;
-    this.priceContainer = this.root ? this.root.querySelector('[data-price]') : null;
-    this.priceCurrent = this.priceContainer ? this.priceContainer.querySelector('[data-price-current]') : null;
-    this.priceCompare = this.priceContainer ? this.priceContainer.querySelector('[data-price-compare]') : null;
+    this.priceCurrent = this.root ? this.root.querySelector('[data-price-current]') : null;
+    this.priceCompare = this.root ? this.root.querySelector('[data-price-compare]') : null;
     this.sku = this.root ? this.root.querySelector('[data-variant-sku]') : null;
     this.statusAvailableText = this.status ? this.status.dataset.availableText || '' : '';
     this.statusUnavailableText = this.status ? this.status.dataset.unavailableText || '' : '';
@@ -75,13 +74,6 @@ class VariantSelects extends HTMLElement {
         this.priceCompare.hidden = true;
       }
     }
-    if (this.priceContainer) {
-      this.priceContainer.classList.toggle('price--sold-out', matchedVariant.available === false);
-      this.priceContainer.classList.toggle(
-        'price--sale',
-        Boolean(matchedVariant.compareAtPrice) && matchedVariant.compareAtPrice !== matchedVariant.price
-      );
-    }
   }
 
   getInventoryText(variant) {
@@ -126,19 +118,23 @@ class PredictiveSearch extends HTMLElement {
 
   async search() {
     const term = this.input.value.trim();
+    this.abortController?.abort();
+    this.abortController = null;
 
     if (term.length < 2) {
       this.results.innerHTML = '';
+      this.activeIndex = -1;
+      this.removeAttribute('loading');
       return;
     }
 
-    if (this.abortController) this.abortController.abort();
-    this.abortController = new AbortController();
+    const controller = new AbortController();
+    this.abortController = controller;
     this.setAttribute('loading', '');
 
     try {
       const response = await fetch(`${this.url}?q=${encodeURIComponent(term)}&section_id=predictive-search`, {
-        signal: this.abortController.signal,
+        signal: controller.signal,
         headers: { Accept: 'text/html' },
       });
 
@@ -152,7 +148,10 @@ class PredictiveSearch extends HTMLElement {
     } catch (error) {
       if (error.name !== 'AbortError') this.results.innerHTML = '';
     } finally {
-      this.removeAttribute('loading');
+      if (this.abortController === controller) {
+        this.removeAttribute('loading');
+        this.abortController = null;
+      }
     }
   }
 
@@ -189,10 +188,6 @@ class PredictiveSearch extends HTMLElement {
 class CartDrawer extends HTMLElement {
   connectedCallback() {
     this.panel = this.querySelector('.cart-drawer__panel');
-    this.items = this.querySelector('[data-cart-items]');
-    this.footer = this.querySelector('[data-cart-footer]');
-    this.subtotal = this.querySelector('[data-cart-subtotal]');
-    this.status = this.querySelector('[data-cart-status]');
     this.cartUrl = this.dataset.cartUrl || '/cart';
     this.changeUrl = this.dataset.cartChangeUrl || '/cart/change';
     this.sectionId = this.dataset.sectionId || 'cart-drawer';
@@ -246,7 +241,7 @@ class CartDrawer extends HTMLElement {
     if (removeButton && this.contains(removeButton)) {
       event.preventDefault();
       const item = removeButton.closest('[data-line-key]');
-      if (item) this.changeLine(item.dataset.lineKey, 0);
+      if (item) this.changeLine(item.dataset.lineKey, 0).catch(() => {});
     }
   }
 
@@ -269,8 +264,16 @@ class CartDrawer extends HTMLElement {
 
     window.clearTimeout(this.changeTimeout);
     this.changeTimeout = window.setTimeout(() => {
-      this.changeLine(item.dataset.lineKey, Number(input.value));
+      const quantity = this.getQuantity(input.value);
+      if (quantity !== null) this.changeLine(item.dataset.lineKey, quantity).catch(() => {});
     }, 300);
+  }
+
+  getQuantity(value) {
+    if (value.trim() === '') return null;
+
+    const quantity = Number(value);
+    return Number.isFinite(quantity) && quantity >= 0 ? Math.trunc(quantity) : null;
   }
 
   handleKeydown(event) {
@@ -338,7 +341,6 @@ class CartDrawer extends HTMLElement {
 
       await this.refreshFromSection(true);
     } catch (error) {
-      if (this.status) this.status.textContent = '';
       form.submit();
     } finally {
       if (button) button.disabled = false;

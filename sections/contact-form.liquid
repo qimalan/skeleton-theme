@@ -1,7 +1,7 @@
 <section class="page-width contact-section">
   <div class="section-heading">
-    <p class="section-heading__eyebrow">Contact</p>
-    <h2>{{ section.settings.heading }}</h2>
+    <p class="section-heading__eyebrow">{{ 'contact.title' | t }}</p>
+    <h2>{{ section.settings.heading | escape }}</h2>
   </div>
 
   {% render 'contact-form', section_id: section.id %}

@@ -1,7 +1,7 @@
 <section class="page-width">
   <div class="section-heading">
     <p class="section-heading__eyebrow">{{ 'blog.title' | t }}</p>
-    <h1>{{ blog.title }}</h1>
+    <h1>{{ blog.title | escape }}</h1>
   </div>
 
   {%- paginate blog.articles by 12 -%}

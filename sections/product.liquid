@@ -20,7 +20,7 @@
     <div class="product-page__media">
       {%- if product.media != blank -%}
         <product-media-gallery class="product-page__media-gallery">
-        <div class="product-page__gallery" data-product-gallery>
+        <div class="product-page__gallery">
           {%- for media in product.media limit: section.settings.media_limit -%}
             {%- liquid
               assign media_loading = 'lazy'
@@ -85,9 +85,9 @@
     <div class="product-page__content">
       <div class="section-heading">
         {%- if section.settings.show_vendor and product.vendor != blank -%}
-          <p class="section-heading__eyebrow">{{ product.vendor }}</p>
+          <p class="section-heading__eyebrow">{{ product.vendor | escape }}</p>
         {%- endif -%}
-        <h1>{{ product.title }}</h1>
+        <h1>{{ product.title | escape }}</h1>
       </div>
 
       <div class="product-page__meta">
@@ -100,7 +100,7 @@
             data-sku-label="{{ 'products.product.sku' | t }}"
           >
             {%- if current_variant.sku != blank -%}
-              {{ 'products.product.sku' | t }}: {{ current_variant.sku }}
+              {{ 'products.product.sku' | t }}: {{ current_variant.sku | escape }}
             {%- endif -%}
           </p>
         {%- endif -%}
@@ -179,7 +179,7 @@
             {%- if block.settings.heading != blank or block.settings.text != blank -%}
               <div class="product-page__info" {{ block.shopify_attributes }}>
                 {%- if block.settings.heading != blank -%}
-                  <h2 class="h4">{{ block.settings.heading }}</h2>
+                  <h2 class="h4">{{ block.settings.heading | escape }}</h2>
                 {%- endif -%}
                 {%- if block.settings.text != blank -%}
                   <div class="rte">{{ block.settings.text }}</div>
@@ -190,7 +190,7 @@
             {%- if block.settings.page != blank -%}
               <div class="product-page__info" {{ block.shopify_attributes }}>
                 {%- if block.settings.heading != blank -%}
-                  <h2 class="h4">{{ block.settings.heading }}</h2>
+                  <h2 class="h4">{{ block.settings.heading | escape }}</h2>
                 {%- endif -%}
                 <div class="rte">{{ block.settings.page.content }}</div>
               </div>
@@ -199,7 +199,7 @@
             {%- if block.settings.heading != blank or block.settings.text != blank -%}
               <details class="product-page__accordion" {{ block.shopify_attributes }} {% if block.settings.open_by_default %}open{% endif %}>
                 <summary>
-                  <span>{{ block.settings.heading }}</span>
+                  <span>{{ block.settings.heading | escape }}</span>
                   {% render 'icon', icon: 'chevron-down' %}
                 </summary>
                 <div class="rte">{{ block.settings.text }}</div>

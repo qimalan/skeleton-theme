@@ -4,7 +4,6 @@
   data-cart-item-count="{{ cart.item_count }}"
   data-section-id="{{ section.id }}"
   data-cart-url="{{ routes.cart_url }}"
-  data-cart-add-url="{{ routes.cart_add_url }}"
   data-cart-change-url="{{ routes.cart_change_url }}"
 >
   <div class="cart-drawer__overlay" data-cart-close></div>
@@ -16,7 +15,7 @@
       </button>
     </div>
 
-    <div class="cart-drawer__items" data-cart-items>
+    <div class="cart-drawer__items">
       {%- if cart.item_count == 0 -%}
         <p class="cart-drawer__empty">{{ 'cart.empty' | t }}</p>
       {%- else -%}
@@ -42,18 +41,16 @@
       {%- endif -%}
     </div>
 
-    <div class="cart-drawer__footer" data-cart-footer {% if cart.item_count == 0 %}hidden{% endif %}>
+    <div class="cart-drawer__footer" {% if cart.item_count == 0 %}hidden{% endif %}>
       <div class="cart-drawer__subtotal">
         <span>{{ 'cart.subtotal' | t }}</span>
-        <strong data-cart-subtotal>{{ cart.total_price | money }}</strong>
+        <strong>{{ cart.total_price | money }}</strong>
       </div>
       <a class="button button--secondary" href="{{ routes.cart_url }}">{{ 'cart.view_cart' | t }}</a>
       <form action="{{ routes.cart_url }}" method="post">
         <button class="button" type="submit" name="checkout">{{ 'cart.checkout' | t }}</button>
       </form>
     </div>
-
-    <p class="cart-drawer__status visually-hidden" data-cart-status role="status" aria-live="polite"></p>
   </aside>
 </cart-drawer>
 
